@@ -6,7 +6,7 @@ services:
     container_name: ecommerce-app
     restart: unless-stopped
     volumes:
-      - ./ecommerce-api:/var/www/html/ecommerce-api
+      - ./ecommerce-api:/var/www/html/
     depends_on:
       - db
 
@@ -17,8 +17,10 @@ services:
     ports:
       - "8068:80"
     volumes:
-      - ./ecommerce-api:/var/www/html/ecommerce-api
+      - ./ecommerce-api:/var/www/html
       - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
 
   db:
     image: mysql:latest

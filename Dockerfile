@@ -43,16 +43,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 # Establecer el directorio de trabajo
 WORKDIR /var/www/html/
 
-# Crear los directorios de almacenamiento y caché necesarios y asignar permisos
-RUN mkdir -p /var/www/html/ecommerce-api/storage \
-    && mkdir -p /var/www/html/ecommerce-api/bootstrap/cache \
-    && chmod -R 777 /var/www/html/ecommerce-api/storage \
-    && chmod -R 777 /var/www/html/ecommerce-api/bootstrap/cache \
-    && chown -R www-data:www-data /var/www/html/ecommerce-api/storage \
-    && chown -R www-data:www-data /var/www/html/ecommerce-api/bootstrap/cache
-
 # Exponer el puerto para PHP-FPM
-EXPOSE 8068
+EXPOSE 9000
 
 # Comando por defecto para ejecutar PHP-FPM
 CMD ["php-fpm"]
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
+
