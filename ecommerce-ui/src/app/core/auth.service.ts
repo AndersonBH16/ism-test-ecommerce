@@ -14,7 +14,7 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    return this.http.post(`${this.apiUrl}/logout`, {});
   }
 
   setToken(token: string) {

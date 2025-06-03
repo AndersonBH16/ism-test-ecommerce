@@ -20,15 +20,4 @@ export class LoginComponent {
       this.router.navigate(['/home']);
     });
   }
-
-  /*login() {
-    this.auth.login(this.email, this.password).subscribe((res: any) => {
-      const token = res.access_token; // AJUSTADO
-      this.auth.setToken(token);
-      this.router.navigate(['/home']);
-    }, error => {
-      console.error('Error de login', error);
-    });
-  }*/
-
 }
