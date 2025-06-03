@@ -10,6 +10,7 @@ import { AuthService } from 'src/app/core/auth.service';
 export class LoginComponent {
   email = '';
   password = '';
+  hidePassword = true;
 
   constructor(private auth: AuthService, private router: Router) {
   }
