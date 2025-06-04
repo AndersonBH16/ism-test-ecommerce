@@ -1,5 +1,73 @@
-<h2>Productos</h2>
-<div class="card-grid">
-  hola
-</div>
+<div class="products-container">
+  <div class="header">
+    <h2>Productos</h2>
+    <p class="subtitle">Descubre nuestra increíble selección de productos</p>
+  </div>
 
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando productos...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadProducts()">
+      Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error" class="card-grid">
+    <mat-card class="product-card" *ngFor="let product of products">
+      <div class="card-image-container">
+        <img
+          mat-card-image
+          [src]="product.image_url"
+          [alt]="product.name"
+          class="product-image"
+          (error)="onImageError($event)"
+        />
+        <div class="card-overlay">
+          <button
+            mat-fab
+            class="wishlist-btn"
+            (click)="addToWishlist(product)"
+            matTooltip="Agregar a favoritos"
+          >
+            <mat-icon>favorite_border</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <mat-card-content class="card-content">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        <div class="category-tag" *ngIf="product.category">
+          <mat-icon>label</mat-icon>
+          <span>{{ product.category.name }}</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="card-actions">
+        <div class="price-section">
+          <span class="price">{{ formatPrice(product.price) }}</span>
+        </div>
+        <button
+          mat-raised-button
+          color="primary"
+          class="add-to-cart-btn"
+          (click)="addToCart(product)"
+        >
+          <mat-icon>shopping_cart</mat-icon>
+          Agregar
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
+    <mat-icon>inventory_2</mat-icon>
+    <h3>No hay productos disponibles</h3>
+    <p>Vuelve más tarde para ver nuevos productos</p>
+  </div>
+</div>

@@ -1,22 +1,27 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthModule } from './pages/auth/auth.module';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtInterceptor } from './core/jwt.interceptor';
+
+// Material modules
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import {FormsModule} from "@angular/forms";
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+import { FormsModule } from "@angular/forms";
 import { ProductsComponent } from './products/products.component';
-import {HomeModule} from "./pages/home/home.module";
+import { HomeModule } from "./pages/home/home.module";
 
 @NgModule({
   declarations: [
@@ -29,8 +34,9 @@ import {HomeModule} from "./pages/home/home.module";
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
     AuthModule,
+    HomeModule,
+    // Material modules
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -38,13 +44,12 @@ import {HomeModule} from "./pages/home/home.module";
     MatSidenavModule,
     MatListModule,
     MatIconModule,
-    HomeModule
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatTooltipModule
   ],
   providers: [
-    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
-  ],
-  exports: [
-    ProductsComponent
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
