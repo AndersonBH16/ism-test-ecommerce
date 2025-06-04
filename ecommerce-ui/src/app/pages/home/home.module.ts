@@ -27,7 +27,7 @@ import {SidebarModule} from "./sidebar/sidebar.module";
     MatListModule,
     MatIconModule,
     TopbarModule,
-    SidebarModule
+    SidebarModule,
   ]
 })
 export class HomeModule { }
