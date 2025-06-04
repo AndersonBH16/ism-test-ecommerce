@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {tap} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +11,23 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string) {
-    return this.http.post(`${this.apiUrl}/login`, { email, password });
+    return this.http.post(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap((res: any) => {
+        if (res.access_token) {
+          localStorage.setItem('token', res.access_token);
+        }
+      })
+    );
   }
 
   logout() {
-    return this.http.post(`${this.apiUrl}/logout`, {});
+    return this.http.post(`${this.apiUrl}/logout`, {}).pipe(
+      tap(() => {
+        localStorage.removeItem('token');
+      })
+    );
   }
+
 
   setToken(token: string) {
     localStorage.setItem('token', token);

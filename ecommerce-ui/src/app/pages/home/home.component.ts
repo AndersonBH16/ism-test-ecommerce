@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from 'src/app/core/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -8,12 +6,7 @@ import { AuthService } from 'src/app/core/auth.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor() {
 
-  logout() {
-    this.auth.logout().subscribe(() => {
-      localStorage.removeItem('token');
-      this.router.navigate(['/login']);
-    });
   }
 }

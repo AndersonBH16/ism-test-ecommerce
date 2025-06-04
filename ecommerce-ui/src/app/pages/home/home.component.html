@@ -1,3 +1,12 @@
-<p>home works!</p>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened class="sidenav">
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
 
-<button mat-raised-button color="warn" (click)="logout()">Cerrar sesión</button>
+  <mat-sidenav-content>
+    <app-topbar (toggleSidenav)="sidenav.toggle()"></app-topbar>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

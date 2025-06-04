@@ -1,0 +1,27 @@
+<mat-toolbar color="">
+  <button mat-icon-button (click)="toggleSidenav.emit()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="app-name">Mi Tienda</span>
+  <span class="spacer"></span>
+  <mat-sidenav-content class="main-content">
+    <mat-toolbar color="" class="toolbar">
+      <button mat-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>account_circle</mat-icon>
+        Anderson
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item><mat-icon>person</mat-icon>Mi Perfil</button>
+        <button mat-menu-item><mat-icon>shopping_cart</mat-icon>Mis Compras</button>
+        <button mat-menu-item><mat-icon>favorite</mat-icon>Mi Lista de Deseos</button>
+        <button mat-menu-item><mat-icon>local_shipping</mat-icon>Mis Pedidos</button>
+        <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>Cerrar Sesión</button>
+      </mat-menu>
+    </mat-toolbar>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-toolbar>
+
+
