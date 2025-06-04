@@ -31,7 +31,6 @@
           <button
             mat-fab
             class="wishlist-btn"
-            (click)="addToWishlist(product)"
             matTooltip="Agregar a favoritos"
           >
             <mat-icon>favorite_border</mat-icon>
@@ -56,10 +55,10 @@
           mat-raised-button
           color="primary"
           class="add-to-cart-btn"
-          (click)="addToCart(product)"
+          (click)="toggleCart(product)"
         >
           <mat-icon>shopping_cart</mat-icon>
-          Agregar
+          {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
         </button>
       </mat-card-actions>
     </mat-card>

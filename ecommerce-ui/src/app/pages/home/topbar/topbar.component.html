@@ -1,3 +1,4 @@
+<!-- src/app/pages/home/topbar/topbar.component.html -->
 <mat-toolbar color="" class="toolbar">
   <button mat-icon-button (click)="toggleSidenav.emit()">
     <mat-icon>menu</mat-icon>
@@ -5,6 +6,11 @@
 
   <span class="app-name">Ecommerce - San Miguel Industries</span>
   <span class="spacer"></span>
+
+  <button mat-icon-button [routerLink]="['/home/buycart']" class="cart-icon">
+    <mat-icon>shopping_cart</mat-icon>
+    <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+  </button>
 
   <button mat-button [matMenuTriggerFor]="userMenu">
     <mat-icon>account_circle</mat-icon>

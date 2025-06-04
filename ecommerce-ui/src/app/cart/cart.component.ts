@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CartService, Cart, CartItem } from '../cart.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
-import {ConfirmDialogComponent} from "../confirm-dialog/confirm-dialog.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -10,15 +7,11 @@ import {ConfirmDialogComponent} from "../confirm-dialog/confirm-dialog.component
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
-  cart: Cart | null = null;
-  loading = true;
-  error = '';
+  cartProducts: any[] = [];
+  loading = false;
+  totalAmount = 0;
 
-  constructor(
-    private cartService: CartService,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.loadCart();
@@ -26,163 +19,79 @@ export class CartComponent implements OnInit {
 
   loadCart(): void {
     this.loading = true;
-    this.error = '';
-
-    this.cartService.getCart().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.cart = response.data;
-        } else {
-          this.error = response.message || 'Error al cargar el carrito';
+    // Simular carga de datos del carrito
+    // Aquí deberías cargar los productos desde tu servicio
+    setTimeout(() => {
+      // Ejemplo de datos
+      this.cartProducts = [
+        {
+          id: 1,
+          name: 'Televisor Smart 50"',
+          description: 'Producto de la categoría...',
+          price: 12.30,
+          image_url: 'assets/images/tv.jpg',
+          category: { name: 'Electrónicos' }
+        },
+        {
+          id: 2,
+          name: 'Audífonos Bluetooth',
+          description: 'Producto de la categoría...',
+          price: 14.60,
+          image_url: 'assets/images/headphones.jpg',
+          category: { name: 'Audio' }
+        },
+        {
+          id: 3,
+          name: 'Laptop Dell Inspiron',
+          description: 'Producto de la categoría...',
+          price: 16.90,
+          image_url: 'assets/images/laptop.jpg',
+          category: { name: 'Computadoras' }
         }
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this.error = 'Error al conectar con el servidor';
-        this.loading = false;
-        this.showMessage('Error al cargar el carrito');
-      }
-    });
+      ];
+
+      this.calculateTotal();
+      this.loading = false;
+    }, 1000);
   }
 
-  updateQuantity(item: CartItem, newQuantity: number): void {
-    if (newQuantity < 1) {
-      this.removeItem(item);
-      return;
+  calculateTotal(): void {
+    this.totalAmount = this.cartProducts.reduce((total, product) => {
+      return total + (product.price || 0);
+    }, 0);
+  }
+
+  removeItem(product: any): void {
+    const index = this.cartProducts.findIndex(p => p.id === product.id);
+    if (index > -1) {
+      this.cartProducts.splice(index, 1);
+      this.calculateTotal();
     }
-
-    this.cartService.updateQuantity(item.id, newQuantity).subscribe({
-      next: (response) => {
-        if (response.success) {
-          // Actualizar la cantidad localmente
-          item.quantity = newQuantity;
-          item.subtotal = item.price * newQuantity;
-          this.recalculateTotal();
-          this.showMessage('Cantidad actualizada');
-        } else {
-          this.showMessage(response.message || 'Error al actualizar cantidad');
-        }
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this.showMessage('Error al actualizar cantidad');
-      }
-    });
-  }
-
-  removeItem(item: CartItem): void {
-    this.cartService.removeFromCart(item.id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          if (this.cart) {
-            this.cart.items = this.cart.items.filter(cartItem => cartItem.id !== item.id);
-            this.recalculateTotal();
-          }
-          this.showMessage(`${item.name} eliminado del carrito`);
-        } else {
-          this.showMessage(response.message || 'Error al eliminar producto');
-        }
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this.showMessage('Error al eliminar producto');
-      }
-    });
   }
 
   clearCart(): void {
-    if (!this.cart || this.cart.items.length === 0) {
-      return;
-    }
-
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px',
-      data: {
-        title: 'Vaciar Carrito',
-        message: '¿Estás seguro de que quieres vaciar todo el carrito?',
-        confirmText: 'Vaciar',
-        cancelText: 'Cancelar'
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.cartService.clearCart().subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.cart = {
-                cart_id: this.cart!.cart_id,
-                items: [],
-                total_items: 0,
-                total_amount: 0
-              };
-              this.showMessage('Carrito vaciado');
-            } else {
-              this.showMessage(response.message || 'Error al vaciar el carrito');
-            }
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            this.showMessage('Error al vaciar el carrito');
-          }
-        });
-      }
-    });
-  }
-
-  private recalculateTotal(): void {
-    if (this.cart) {
-      this.cart.total_items = this.cart.items.reduce((sum, item) => sum + item.quantity, 0);
-      this.cart.total_amount = this.cart.items.reduce((sum, item) => sum + item.subtotal, 0);
-    }
-  }
-
-  increaseQuantity(item: CartItem): void {
-    this.updateQuantity(item, item.quantity + 1);
-  }
-
-  decreaseQuantity(item: CartItem): void {
-    if (item.quantity > 1) {
-      this.updateQuantity(item, item.quantity - 1);
-    } else {
-      this.removeItem(item);
-    }
-  }
-
-  onImageError(event: Event): void {
-    const target = event.target as HTMLImageElement;
-    if (target) {
-      target.src = 'assets/img/ecommerce_icon.jpg';
-    }
+    this.cartProducts = [];
+    this.calculateTotal();
   }
 
   formatPrice(price: number): string {
-    return new Intl.NumberFormat('es-PE', {
-      style: 'currency',
-      currency: 'PEN'
-    }).format(price);
+    if (price === null || price === undefined || isNaN(price)) {
+      return 'S/ 0.00';
+    }
+    return `S/ ${price.toFixed(2)}`;
   }
 
-  trackByItemId(index: number, item: CartItem): number {
-    return item.id;
+  trackByProductId(index: number, product: any): number {
+    return product.id;
   }
 
-  private showMessage(message: string): void {
-    this.snackBar.open(message, 'Cerrar', {
-      duration: 3000,
-      horizontalPosition: 'right',
-      verticalPosition: 'top'
-    });
+  onImageError(event: any): void {
+    event.target.src = 'assets/img/ecommerce_icon.jpg';
   }
 
   proceedToCheckout(): void {
-    if (!this.cart || this.cart.items.length === 0) {
-      this.showMessage('El carrito está vacío');
-      return;
+    if (this.cartProducts.length > 0) {
+      this.router.navigate(['/checkout']);
     }
-
-    // Aquí implementarías la lógica para proceder al checkout
-    this.showMessage('Funcionalidad de checkout pendiente de implementar');
   }
 }

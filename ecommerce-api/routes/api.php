@@ -27,10 +27,4 @@ Route::group([
         Route::delete('/clear', [CartController::class, 'clearCart']);
         Route::get('/count', [CartController::class, 'getCartCount']);
     });
-
-    Route::prefix('wishlist')->group(function () {
-        Route::post('/add', function() {
-            return response()->json(['message' => 'Added to wishlist']);
-        });
-    });
 });

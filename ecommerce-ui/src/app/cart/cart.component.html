@@ -1,32 +1,19 @@
 <div class="cart-container">
   <div class="header">
     <h2>Mi Carrito</h2>
-    <p class="subtitle" *ngIf="cart && cart.items.length > 0">
-      {{ cart.total_items }} producto{{ cart.total_items !== 1 ? 's' : '' }}
+    <p class="subtitle" *ngIf="cartProducts.length > 0">
+      {{ cartProducts.length }} producto{{ cartProducts.length !== 1 ? 's' : '' }}
     </p>
   </div>
 
-  <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
     <mat-spinner></mat-spinner>
     <p>Cargando carrito...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="error && !loading" class="error-container">
-    <mat-icon>error_outline</mat-icon>
-    <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="loadCart()">
-      Reintentar
-    </button>
-  </div>
-
-  <!-- Cart Content -->
-  <div *ngIf="!loading && !error && cart" class="cart-content">
-
-    <!-- Empty Cart -->
-    <div *ngIf="cart.items.length === 0" class="empty-cart">
-      <mat-icon>shopping_cart</mat-icon>
+  <div *ngIf="!loading" class="cart-content">
+    <div *ngIf="!loading && cartProducts.length === 0" class="empty-cart">
+      <mat-icon class="empty-icon">shopping_cart</mat-icon>
       <h3>Tu carrito está vacío</h3>
       <p>Agrega algunos productos para comenzar tu compra</p>
       <button mat-raised-button color="primary" routerLink="/home/productos">
@@ -34,122 +21,94 @@
       </button>
     </div>
 
-    <!-- Cart Items -->
-    <div *ngIf="cart.items.length > 0" class="cart-items-container">
+    <div *ngIf="cartProducts.length > 0" class="cart-items-container">
+      <div class="cart-items-section">
+        <div class="cart-actions-header">
+          <button mat-stroked-button color="warn"
+                  (click)="clearCart()"
+                  [disabled]="cartProducts.length === 0">
+            <mat-icon>delete_sweep</mat-icon>
+            Vaciar Carrito
+          </button>
+        </div>
 
-      <!-- Cart Header Actions -->
-      <div class="cart-actions-header">
-        <button mat-stroked-button color="warn" (click)="clearCart()"
-                [disabled]="cart.items.length === 0">
-          <mat-icon>clear_all</mat-icon>
-          Vaciar Carrito
-        </button>
+        <div class="cart-items">
+          <mat-card class="cart-item" *ngFor="let product of cartProducts; trackBy: trackByProductId">
+            <div class="item-content">
+              <div class="item-image">
+                <img [src]="product.image_url"
+                     alt="{{ product.name }}"
+                     (error)="onImageError($event)"
+                     class="product-image"/>
+              </div>
+
+              <div class="item-info">
+                <h3 class="item-name">{{ product.name }}</h3>
+                <p class="item-description">{{ product.description }}</p>
+
+                <mat-chip *ngIf="product.category">
+                  {{ product.category.name }}
+                </mat-chip>
+
+                <div class="item-price">
+                  <span>{{ formatPrice(product.price) }}</span>
+                </div>
+              </div>
+
+              <div class="item-actions">
+                <button mat-icon-button color="warn"
+                        (click)="removeItem(product)"
+                        matTooltip="Eliminar del carrito">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-card>
+        </div>
       </div>
 
-      <!-- Cart Items List -->
-      <div class="cart-items">
-        <mat-card class="cart-item" *ngFor="let item of cart.items; trackBy: trackByItemId">
-          <div class="item-content">
+      <div class="cart-summary-section">
+        <mat-card class="cart-summary">
+          <mat-card-header>
+            <mat-card-title>Resumen del Pedido</mat-card-title>
+          </mat-card-header>
 
-            <!-- Product Image -->
-            <div class="item-image">
-              <img [src]="item.image_url"
-                   [alt]="item.name"
-                   (error)="onImageError($event)"
-                   class="product-image" />
+          <mat-card-content>
+            <div class="summary-row">
+              <span>Productos ({{ cartProducts.length }})</span>
+              <span>{{ formatPrice(totalAmount) }}</span>
             </div>
 
-            <!-- Product Info -->
-            <div class="item-info">
-              <h3 class="item-name">{{ item.name }}</h3>
-              <p class="item-description">{{ item.description }}</p>
-              <div class="item-category" *ngIf="item.category">
-                <mat-chip>{{ item.category.name }}</mat-chip>
-              </div>
-              <div class="item-price">
-                <span class="unit-price">{{ formatPrice(item.price) }} c/u</span>
-              </div>
+            <div class="summary-row">
+              <span>Envío</span>
+              <span>Gratis</span>
             </div>
 
-            <!-- Quantity Controls -->
-            <div class="quantity-controls">
-              <div class="quantity-section">
-                <button mat-icon-button
-                        (click)="decreaseQuantity(item)"
-                        [disabled]="item.quantity <= 1">
-                  <mat-icon>remove</mat-icon>
-                </button>
+            <mat-divider></mat-divider>
 
-                <span class="quantity-display">{{ item.quantity }}</span>
-
-                <button mat-icon-button (click)="increaseQuantity(item)">
-                  <mat-icon>add</mat-icon>
-                </button>
-              </div>
-
-              <div class="subtotal">
-                {{ formatPrice(item.subtotal) }}
-              </div>
+            <div class="summary-row total-row">
+              <span class="total-label">Total</span>
+              <span class="total-amount">{{ formatPrice(totalAmount) }}</span>
             </div>
+          </mat-card-content>
 
-            <!-- Remove Button -->
-            <div class="item-actions">
-              <button mat-icon-button
-                      color="warn"
-                      (click)="removeItem(item)"
-                      matTooltip="Eliminar del carrito">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
+          <mat-card-actions align="end">
+            <button mat-raised-button color="primary"
+                    class="checkout-btn"
+                    (click)="proceedToCheckout()"
+                    [disabled]="cartProducts.length === 0">
+              <mat-icon>payment</mat-icon>
+              Proceder al Pago
+            </button>
 
-          </div>
+            <button mat-stroked-button color="primary"
+                    routerLink="/home/productos">
+              <mat-icon>arrow_back</mat-icon>
+              Seguir Comprando
+            </button>
+          </mat-card-actions>
         </mat-card>
       </div>
-
-      <!-- Cart Summary -->
-      <mat-card class="cart-summary">
-        <mat-card-header>
-          <mat-card-title>Resumen del Pedido</mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
-          <div class="summary-row">
-            <span>Productos ({{ cart.total_items }})</span>
-            <span>{{ formatPrice(cart.total_amount) }}</span>
-          </div>
-
-          <div class="summary-row">
-            <span>Envío</span>
-            <span>Gratis</span>
-          </div>
-
-          <mat-divider></mat-divider>
-
-          <div class="summary-row total-row">
-            <span class="total-label">Total</span>
-            <span class="total-amount">{{ formatPrice(cart.total_amount) }}</span>
-          </div>
-        </mat-card-content>
-
-        <mat-card-actions>
-          <button mat-raised-button
-                  color="primary"
-                  class="checkout-btn"
-                  (click)="proceedToCheckout()"
-                  [disabled]="cart.items.length === 0">
-            <mat-icon>payment</mat-icon>
-            Proceder al Pago
-          </button>
-
-          <button mat-stroked-button
-                  color="primary"
-                  routerLink="/home/productos">
-            <mat-icon>arrow_back</mat-icon>
-            Seguir Comprando
-          </button>
-        </mat-card-actions>
-      </mat-card>
-
     </div>
   </div>
 </div>

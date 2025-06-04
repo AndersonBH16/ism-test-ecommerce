@@ -16,7 +16,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'productos', pathMatch: 'full' },
       { path: 'productos', component: ProductsComponent },
-      { path: 'carrito', component: CartComponent }
+      { path: 'buycart', component: CartComponent }
     ]
   },
   { path: '**', redirectTo: 'login' }
