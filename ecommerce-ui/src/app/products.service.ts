@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Product {
@@ -7,21 +7,18 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
   image_url: string;
-  category_id: number;
   category?: {
     id: number;
     name: string;
   };
-  created_at: string;
-  updated_at: string;
 }
 
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
-  message: string;
+  message?: string;
+  error?: string;
 }
 
 @Injectable({
@@ -32,24 +29,38 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getAllProducts(): Observable<ApiResponse<Product[]>> {
-    return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}/products`);
-  }
-
-  getProduct(id: number): Observable<ApiResponse<Product>> {
-    return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/products/${id}`);
-  }
-
-  addToCart(productId: number, quantity: number = 1): Observable<any> {
-    return this.http.post(`${this.apiUrl}/cart/add`, {
-      product_id: productId,
-      quantity: quantity
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 
-  addToWishlist(productId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/wishlist/add`, {
+  getAllProducts(): Observable<ApiResponse<Product[]>> {
+    return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}/products`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  addToCart(productId: number, quantity: number = 1): Observable<ApiResponse<any>> {
+    const body = {
+      product_id: productId,
+      quantity: quantity
+    };
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/cart/add`, body, {
+      headers: this.getHeaders()
+    });
+  }
+
+  addToWishlist(productId: number): Observable<ApiResponse<any>> {
+    const body = {
       product_id: productId
+    };
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/wishlist/add`, body, {
+      headers: this.getHeaders()
     });
   }
 }

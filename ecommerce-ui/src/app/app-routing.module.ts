@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { ProductsComponent } from "./products/products.component";
+import { CartComponent } from "./cart/cart.component";
 import { HomeComponent } from "./pages/home/home.component";
 import { authGuard } from './core/auth.guard';
 
@@ -14,7 +15,8 @@ const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'productos', pathMatch: 'full' },
-      { path: 'productos', component: ProductsComponent }
+      { path: 'productos', component: ProductsComponent },
+      { path: 'carrito', component: CartComponent }
     ]
   },
   { path: '**', redirectTo: 'login' }

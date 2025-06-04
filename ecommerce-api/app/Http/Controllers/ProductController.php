@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $products = Product::with('category')->get();
+            $products = Product::with('category')->limit(12)->get();
 
             $products->transform(function ($product) {
                 if ($product->image) {

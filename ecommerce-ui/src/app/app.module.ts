@@ -22,11 +22,19 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from "@angular/forms";
 import { ProductsComponent } from './products/products.component';
 import { HomeModule } from "./pages/home/home.module";
+import { CartComponent } from './cart/cart.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import { CartBadgeComponent } from './cart-badge/cart-badge.component';
+import {MatChipsModule} from "@angular/material/chips";
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProductsComponent
+    ProductsComponent,
+    CartComponent,
+    ConfirmDialogComponent,
+    CartBadgeComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +54,9 @@ import { HomeModule } from "./pages/home/home.module";
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule,
+    MatChipsModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }

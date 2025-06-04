@@ -24,6 +24,8 @@ Route::group([
         Route::post('/add', [CartController::class, 'addToCart']);
         Route::put('/update/{id}', [CartController::class, 'updateQuantity']);
         Route::delete('/remove/{id}', [CartController::class, 'removeFromCart']);
+        Route::delete('/clear', [CartController::class, 'clearCart']);
+        Route::get('/count', [CartController::class, 'getCartCount']);
     });
 
     Route::prefix('wishlist')->group(function () {
