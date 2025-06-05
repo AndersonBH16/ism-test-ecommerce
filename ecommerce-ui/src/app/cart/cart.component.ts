@@ -1,12 +1,11 @@
-// src/app/cart/cart.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { CartService } from '../cart.service';
+import { CartService, CartItem } from '../cart.service';
 import { ProductService, Product } from '../products.service';
-import {MatSnackBar} from "@angular/material/snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-cart',
@@ -28,38 +27,36 @@ export class CartComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCart();
+    this.cartService.cartItems$.subscribe(() => {
+      this.loadCart();
+    });
   }
 
   loadCart(): void {
-    this.loading = true;
-    const productIds = this.cartService.getCartItems();
-
-    if (!productIds || productIds.length === 0) {
+    const cartItems: CartItem[] = this.cartService.getCartItems();
+    if (!cartItems || cartItems.length === 0) {
       this.cartProducts = [];
-      this.totalAmount = 0;
-      this.loading = false;
+      this.cartQuantities = {};
       return;
     }
 
-    const observables = productIds.map(id =>
-      this.productService.getProduct(id).pipe(
-        map(response => response.data),
+    const observables = cartItems.map(item =>
+      this.productService.getProduct(item.id).pipe(
+        map(response => {
+          return { product: response.data as Product, quantity: item.quantity };
+        }),
         catchError(() => of(null))
       )
     );
 
     forkJoin(observables).subscribe(results => {
-      this.cartProducts = (results.filter(prod => prod !== null) as Product[]);
-
-      this.cartProducts.forEach(prod => {
-        if (this.cartQuantities[prod.id] === undefined) {
-          this.cartQuantities[prod.id] = 1;
-        }
+      const validResults = results.filter(r => r !== null) as { product: Product; quantity: number }[];
+      this.cartProducts = validResults.map(r => r.product);
+      this.cartQuantities = {};
+      validResults.forEach(r => {
+        this.cartQuantities[r.product.id] = r.quantity;
       });
-
       this.calculateTotal();
-      this.loading = false;
     });
   }
 
@@ -67,20 +64,37 @@ export class CartComponent implements OnInit {
     this.totalAmount = this.cartProducts.reduce((total, product) => {
       const qty = this.cartQuantities[product.id] || 1;
       const priceNum = Number(product.price);
-      return isNaN(priceNum) ? total : total + priceNum * qty;
+      if (isNaN(priceNum)) return total;
+      return total + priceNum * qty;
+    }, 0);
+  }
+
+  getProductSubtotal(product: Product): number {
+    const qty = this.cartQuantities[product.id] || 1;
+    const priceNum = Number(product.price);
+    return isNaN(priceNum) ? 0 : priceNum * qty;
+  }
+
+  getTotalProductsCount(): number {
+    return this.cartProducts.reduce((sum, product) => {
+      return sum + (this.cartQuantities[product.id] || 1);
     }, 0);
   }
 
   removeItem(product: Product): void {
     this.cartService.removeFromCart(product.id);
-    this.cartProducts = this.cartProducts.filter(p => p.id !== product.id);
-    this.calculateTotal();
+    this.snackBar.open(`${product.name} eliminado del carrito`, 'Cerrar', {
+      duration: 2000
+    });
+    // La suscripción a cartItems$ volverá a disparar loadCart()
   }
 
   clearCart(): void {
     this.cartService.clearCart();
-    this.cartProducts = [];
-    this.totalAmount = 0;
+    this.snackBar.open(`Carrito vaciado`, 'Cerrar', {
+      duration: 2000
+    });
+    // loadCart() se dispara automáticamente
   }
 
   formatPrice(price: any): string {
@@ -88,28 +102,34 @@ export class CartComponent implements OnInit {
     if (isNaN(value)) {
       return 'S/ 0.00';
     }
-    return `S/ ${value.toFixed(2)}`;
+    return new Intl.NumberFormat('es-PE', {
+      style: 'currency',
+      currency: 'PEN'
+    }).format(value);
   }
 
   trackByProductId(index: number, product: Product): number {
     return product.id;
   }
 
+  // Método para manejar error de carga de imagen
   onImageError(event: any): void {
     event.target.src = 'assets/img/ecommerce_icon.jpg';
   }
 
   increaseCartQuantity(product: Product): void {
-    if (this.cartQuantities[product.id] < product.stock) {
-      this.cartQuantities[product.id]++;
-      this.calculateTotal();
+    const currentQty = this.cartQuantities[product.id] || 1;
+    if (currentQty < product.stock) {
+      const newQty = currentQty + 1;
+      this.cartService.updateQuantity(product.id, newQty);
     }
   }
 
   decreaseCartQuantity(product: Product): void {
-    if (this.cartQuantities[product.id] > 1) {
-      this.cartQuantities[product.id]--;
-      this.calculateTotal();
+    const currentQty = this.cartQuantities[product.id] || 1;
+    if (currentQty > 1) {
+      const newQty = currentQty - 1;
+      this.cartService.updateQuantity(product.id, newQty);
     }
   }
 
@@ -132,11 +152,6 @@ export class CartComponent implements OnInit {
             verticalPosition: 'bottom'
           });
           this.cartService.clearCart();
-          this.cartProducts = [];
-          this.cartQuantities = {};
-          this.totalAmount = 0;
-          // (Opcional) Redirigir a “Mis Pedidos”:
-          // this.router.navigate(['/home/mis-pedidos']);
         } else {
           this.snackBar.open('Error al registrar el pedido', 'Cerrar', {
             duration: 3000
@@ -148,7 +163,7 @@ export class CartComponent implements OnInit {
         this.snackBar.open(
           'Ocurrió un error al procesar tu pedido. Intenta nuevamente.',
           'Cerrar',
-          {duration: 4000}
+          { duration: 4000 }
         );
       }
     });

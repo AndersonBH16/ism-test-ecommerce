@@ -2,10 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Product, ProductService, Category } from "../products.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { CartService } from "../cart.service";
+import { CartService, CartItem } from "../cart.service";
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-import {MatDialog} from "@angular/material/dialog";
-import {ProductDetailDialogComponent} from "../product-detail-dialog/product-detail-dialog.component";
+import { MatDialog } from "@angular/material/dialog";
+import { ProductDetailDialogComponent } from "../product-detail-dialog/product-detail-dialog.component";
 
 @Component({
   selector: 'app-products',
@@ -29,7 +29,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   lastPage = 1;
   totalProducts = 0;
 
-  cartProductIds: number[] = [];
+  cartItems: CartItem[] = [];
   private destroy$ = new Subject<void>();
 
   quantities: { [productId: number]: number } = {};
@@ -80,8 +80,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   setupCartSubscription(): void {
     this.cartService.cartItems$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((ids: number[]) => {
-        this.cartProductIds = ids;
+      .subscribe((cartItems: CartItem[]) => {
+        this.cartItems = cartItems;
       });
   }
 
@@ -123,7 +123,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
           this.products.forEach(prod => {
             if (this.quantities[prod.id] === undefined) {
-              this.quantities[prod.id] = 1;
+              const cartItem = this.cartItems.find(item => item.id === prod.id);
+              this.quantities[prod.id] = cartItem ? cartItem.quantity : 1;
             }
           });
 
@@ -150,12 +151,20 @@ export class ProductsComponent implements OnInit, OnDestroy {
   increaseQuantity(product: Product): void {
     if (this.quantities[product.id] < product.stock) {
       this.quantities[product.id]++;
+
+      if (this.isInCart(product)) {
+        this.cartService.updateQuantity(product.id, this.quantities[product.id]);
+      }
     }
   }
 
   decreaseQuantity(product: Product): void {
     if (this.quantities[product.id] > 1) {
       this.quantities[product.id]--;
+
+      if (this.isInCart(product)) {
+        this.cartService.updateQuantity(product.id, this.quantities[product.id]);
+      }
     }
   }
 
@@ -175,10 +184,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         verticalPosition: 'bottom'
       });
     } else {
-      // Llamamos a addToCart usandola cantidad actual
-      // Para simplificar la lógica de CartService (que solo usa IDs), agregamos la ID.
-      // Pero en createOrderProducts se envía la cantidad real desde cartProducts con cantidades en CartComponent.
-      this.cartService.addToCart(product.id);
+      this.cartService.addToCart(product.id, this.quantities[product.id]);
       this.snackBar.open(
         `${product.name} agregado al carrito (x${this.quantities[product.id]})`,
         'Cerrar',
@@ -213,13 +219,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Se invoca cuando cambia el campo de orden
   onSortByChange(newSortBy: string): void {
     this.sortBy = newSortBy;
     this.goToPage(1);
   }
 
-  // Se invoca cuando cambia la dirección del orden
   onSortOrderChange(newSortOrder: 'asc' | 'desc'): void {
     this.sortOrder = newSortOrder;
     this.goToPage(1);
@@ -250,7 +254,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   isInCart(product: Product): boolean {
-    return this.cartProductIds.includes(product.id);
+    return this.cartService.isInCart(product.id);
   }
 
   onImageError(event: Event): void {

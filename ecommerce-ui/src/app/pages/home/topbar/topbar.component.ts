@@ -1,8 +1,7 @@
-// src/app/pages/home/topbar/topbar.component.ts
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { AuthService } from "../../../core/auth.service";
 import { Router } from "@angular/router";
-import { CartService } from "../../../cart.service";
+import { CartService, CartItem } from "../../../cart.service";
 
 @Component({
   selector: 'app-topbar',
@@ -20,8 +19,8 @@ export class TopbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cartService.cartItems$.subscribe((ids: number[]) => {
-      this.cartItemCount = ids.length;
+    this.cartService.cartItems$.subscribe((items: CartItem[]) => {
+      this.cartItemCount = items.length;
     });
   }
 
