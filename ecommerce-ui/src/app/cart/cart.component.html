@@ -1,3 +1,4 @@
+<!-- src/app/cart/cart.component.html -->
 <div class="cart-container">
   <div class="header">
     <h2>Mi Carrito</h2>
@@ -12,6 +13,7 @@
   </div>
 
   <div *ngIf="!loading" class="cart-content">
+    <!-- Estado vacío -->
     <div *ngIf="!loading && cartProducts.length === 0" class="empty-cart">
       <mat-icon class="empty-icon">shopping_cart</mat-icon>
       <h3>Tu carrito está vacío</h3>
@@ -21,6 +23,7 @@
       </button>
     </div>
 
+    <!-- Lista de productos en carrito -->
     <div *ngIf="cartProducts.length > 0" class="cart-items-container">
       <div class="cart-items-section">
         <div class="cart-actions-header">
@@ -33,7 +36,8 @@
         </div>
 
         <div class="cart-items">
-          <mat-card class="cart-item" *ngFor="let product of cartProducts; trackBy: trackByProductId">
+          <mat-card class="cart-item"
+                    *ngFor="let product of cartProducts; trackBy: trackByProductId">
             <div class="item-content">
               <div class="item-image">
                 <img [src]="product.image_url"
@@ -67,6 +71,7 @@
         </div>
       </div>
 
+      <!-- Resumen del pedido -->
       <div class="cart-summary-section">
         <mat-card class="cart-summary">
           <mat-card-header>

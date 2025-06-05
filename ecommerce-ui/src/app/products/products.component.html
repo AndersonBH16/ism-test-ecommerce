@@ -1,11 +1,10 @@
 <div class="products-container">
-  <!-- Header con búsqueda -->
   <div class="header">
     <div class="header-content">
       <div class="title-section">
         <h2>Productos</h2>
         <br>
-        <p class="subtitle">Descubre nuestra increíble selección de productos</p>
+        <p class="subtitle">Bienvenido! Descubre nuestros mejores productos al mejor precio.</p>
       </div>
       <br>
       <div class="search-section">
@@ -53,13 +52,11 @@
     </div>
   </div>
 
-  <!-- Loading inicial -->
   <div *ngIf="loading" class="loading-container">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Cargando productos...</p>
   </div>
 
-  <!-- Error -->
   <div *ngIf="error && !loading" class="error-container">
     <mat-icon color="warn">error_outline</mat-icon>
     <h3>¡Oops! Algo salió mal</h3>
@@ -70,7 +67,6 @@
     </button>
   </div>
 
-  <!-- Resultados de búsqueda -->
   <div *ngIf="!loading && !error && (searchControl.value || selectedCategories.length > 0)" class="search-results">
     <p class="results-info">
       <mat-icon>info</mat-icon>
@@ -92,6 +88,8 @@
             mat-card-image
             [src]="product.image_url"
             [alt]="product.name"
+            width="300"
+            height="300"
             class="product-image"
             (error)="onImageError($event)"
             loading="lazy"
@@ -153,7 +151,9 @@
     <!-- Estado vacío -->
     <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
       <mat-icon>search_off</mat-icon>
-      <h3>No encontramos productos</h3>
+      <p *ngIf="searchControl.value || selectedCategories.length > 0">
+        No se encontraron productos con los filtros actuales.
+      </p>
       <p *ngIf="searchControl.value || selectedCategories.length > 0">
         Intenta ajustar tus filtros de búsqueda
       </p>

@@ -1,5 +1,11 @@
+// src/app/cart/cart.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
+import { CartService } from '../cart.service';
+import { ProductService, Product } from '../products.service';
 
 @Component({
   selector: 'app-cart',
@@ -7,81 +13,76 @@ import { Router } from '@angular/router';
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
-  cartProducts: any[] = [];
+  cartProducts: Product[] = [];
   loading = false;
   totalAmount = 0;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cartService: CartService,
+    private productService: ProductService
+  ) {}
 
   ngOnInit(): void {
     this.loadCart();
   }
 
+  /**
+   * Carga de forma dinámica los productos cuyo ID esté en el carrito.
+   */
   loadCart(): void {
     this.loading = true;
-    // Simular carga de datos del carrito
-    // Aquí deberías cargar los productos desde tu servicio
-    setTimeout(() => {
-      // Ejemplo de datos
-      this.cartProducts = [
-        {
-          id: 1,
-          name: 'Televisor Smart 50"',
-          description: 'Producto de la categoría...',
-          price: 12.30,
-          image_url: 'assets/images/tv.jpg',
-          category: { name: 'Electrónicos' }
-        },
-        {
-          id: 2,
-          name: 'Audífonos Bluetooth',
-          description: 'Producto de la categoría...',
-          price: 14.60,
-          image_url: 'assets/images/headphones.jpg',
-          category: { name: 'Audio' }
-        },
-        {
-          id: 3,
-          name: 'Laptop Dell Inspiron',
-          description: 'Producto de la categoría...',
-          price: 16.90,
-          image_url: 'assets/images/laptop.jpg',
-          category: { name: 'Computadoras' }
-        }
-      ];
+    const productIds = this.cartService.getCartItems();
 
+    if (!productIds || productIds.length === 0) {
+      this.cartProducts = [];
+      this.totalAmount = 0;
+      this.loading = false;
+      return;
+    }
+
+    const observables = productIds.map(id =>
+      this.productService.getProduct(id).pipe(
+        map(response => response.data),
+        catchError(() => of(null))
+      )
+    );
+
+    forkJoin(observables).subscribe(results => {
+      this.cartProducts = (results.filter(prod => prod !== null) as Product[]);
       this.calculateTotal();
       this.loading = false;
-    }, 1000);
+    });
   }
 
   calculateTotal(): void {
     this.totalAmount = this.cartProducts.reduce((total, product) => {
-      return total + (product.price || 0);
+      const priceNum = Number(product.price);
+      return isNaN(priceNum) ? total : total + priceNum;
     }, 0);
   }
 
-  removeItem(product: any): void {
-    const index = this.cartProducts.findIndex(p => p.id === product.id);
-    if (index > -1) {
-      this.cartProducts.splice(index, 1);
-      this.calculateTotal();
-    }
-  }
-
-  clearCart(): void {
-    this.cartProducts = [];
+  removeItem(product: Product): void {
+    this.cartService.removeFromCart(product.id);
+    this.cartProducts = this.cartProducts.filter(p => p.id !== product.id);
     this.calculateTotal();
   }
 
-  formatPrice(price: number): string {
-    if (price === null || price === undefined || isNaN(price)) {
-      return 'S/ 0.00';
-    }
-    return `S/ ${price.toFixed(2)}`;
+  clearCart(): void {
+    this.cartService.clearCart();
+    this.cartProducts = [];
+    this.totalAmount = 0;
   }
 
-  trackByProductId(index: number, product: any): number {
+  formatPrice(price: any): string {
+    const value = Number(price);
+    if (isNaN(value)) {
+      return 'S/ 0.00';
+    }
+    return `S/ ${value.toFixed(2)}`;
+  }
+
+  trackByProductId(index: number, product: Product): number {
     return product.id;
   }
 

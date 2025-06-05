@@ -40,7 +40,7 @@ class ProductController extends Controller
             }
 
             // Paginación
-            $perPage = $request->get('per_page', 12);
+            $perPage = $request->get('per_page', 4);
             $perPage = min($perPage, 50); // Máximo 50 por página
 
             if ($request->has('page')) {

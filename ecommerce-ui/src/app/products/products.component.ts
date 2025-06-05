@@ -148,11 +148,42 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   loadMoreProducts(): void {
-    if (!this.hasMoreProducts || this.loadingMore) return;
+    if (this.loadingMore || !this.hasMoreProducts) return;
 
-    this.currentPage++;
-    this.loadProducts(false);
+    this.loadingMore = true;
+    this.currentPage += 1; // ✅ Asegúrate de incrementar aquí
+
+    const params = {
+      page: this.currentPage,
+      per_page: this.perPage,
+      search: this.searchControl.value || '',
+      categories: this.selectedCategories.length > 0 ? this.selectedCategories : undefined
+    };
+
+    this.productService.getProducts(params).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = [...this.products, ...response.data];
+
+          if (response.meta) {
+            this.totalProducts = response.meta.total;
+            this.hasMoreProducts = this.currentPage < response.meta.last_page;
+          } else {
+            this.hasMoreProducts = response.data.length === this.perPage;
+          }
+        } else {
+          this.error = response.message || 'Error al cargar los productos';
+        }
+
+        this.loadingMore = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar más productos:', error);
+        this.loadingMore = false;
+      }
+    });
   }
+
 
   resetAndSearch(): void {
     this.currentPage = 1;
