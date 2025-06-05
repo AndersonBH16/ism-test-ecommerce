@@ -15,7 +15,6 @@
           <input
             matInput
             [formControl]="searchControl"
-            #searchInput
             placeholder="Buscar por nombre o descripción"
           />
           <mat-icon matSuffix>search</mat-icon>
@@ -76,6 +75,8 @@
       </mat-select>
     </mat-form-field>
   </div>
+
+
   <!-- FIN CONTROLES DE ORDENAMIENTO -->
 
   <div *ngIf="loading" class="loading-container">
@@ -109,7 +110,6 @@
     </p>
   </div>
 
-  <!-- Cards de los Productos -->
   <div *ngIf="!loading && !error" class="products-grid">
     <div class="card-grid">
       <mat-card
@@ -119,10 +119,8 @@
         <div class="card-image-container">
           <img
             mat-card-image
-            [src]="product.image_url"
+            [src]="product.image"
             [alt]="product.name"
-            width="300"
-            height="300"
             class="product-image"
             (error)="onImageError($event)"
             loading="lazy"
@@ -141,38 +139,70 @@
             <mat-chip>{{ product.category.name }}</mat-chip>
           </div>
         </div>
+
         <mat-card-content class="card-content">
-          <div class="title-with-button">
+          <div class="name-and-quantity">
             <h3 class="product-name" [matTooltip]="product.name">
               {{ product.name }}
             </h3>
-            <button
-              mat-button
-              class="details-btn"
-              (click)="openProductDialog(product)"
-            >
-              <mat-icon>visibility</mat-icon>
-              Ver detalles
-            </button>
+            <div class="quantity-selector-horizontal">
+              <button
+                mat-mini-fab
+                (click)="decreaseQuantity(product)"
+                [disabled]="quantities[product.id] <= 1"
+              >
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span class="quantity-value">
+                {{ quantities[product.id] }}
+              </span>
+              <button
+                mat-mini-fab
+                (click)="increaseQuantity(product)"
+                [disabled]="quantities[product.id] >= product.stock"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
           </div>
         </mat-card-content>
+
+        <mat-card-content class="price-content">
+          <span class="price">{{ formatPrice(product.price) }}</span>
+        </mat-card-content>
+
         <mat-card-actions class="card-actions">
-          <div class="price-section">
-            <span class="price">{{ formatPrice(product.price) }}</span>
-          </div>
+          <button
+            mat-button
+            class="details-btn"
+            (click)="openProductDialog(product)"
+          >
+            <mat-icon>visibility</mat-icon>
+            Ver detalles
+          </button>
+
           <button
             mat-raised-button
-            [ngClass]="isInCart(product) ? 'remove-from-cart-btn' : 'add-to-cart-btn'"
+            [ngClass]="
+        isInCart(product) ? 'remove-from-cart-btn' : 'add-to-cart-btn'
+      "
             [color]="isInCart(product) ? 'warn' : 'primary'"
             (click)="toggleCart(product)"
+            [disabled]="product.stock === 0"
             [matTooltip]="
-            isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'
-          "
+        product.stock === 0
+          ? 'Sin stock disponible'
+          : isInCart(product)
+          ? 'Quitar del carrito'
+          : 'Agregar al carrito'
+      "
           >
             <mat-icon>
-              {{ isInCart(product)
-              ? 'remove_shopping_cart'
-              : 'add_shopping_cart' }}
+              {{
+              isInCart(product)
+                ? 'remove_shopping_cart'
+                : 'add_shopping_cart'
+              }}
             </mat-icon>
             {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
           </button>
@@ -185,15 +215,13 @@
         <mat-icon>chevron_left</mat-icon>
         Anterior
       </button>
-
-      <span class="page-info">
-      Página {{ currentPage }} de {{ lastPage }}
-    </span>
-
+      <span class="page-info">Página {{ currentPage }} de {{ lastPage }}</span>
       <button mat-button (click)="nextPage()" [disabled]="currentPage === lastPage">
         Siguiente
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
   </div>
+
+
 </div>

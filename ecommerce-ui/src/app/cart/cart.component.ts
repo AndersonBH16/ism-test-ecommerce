@@ -6,6 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 
 import { CartService } from '../cart.service';
 import { ProductService, Product } from '../products.service';
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-cart',
@@ -17,19 +18,19 @@ export class CartComponent implements OnInit {
   loading = false;
   totalAmount = 0;
 
+  cartQuantities: { [productId: number]: number } = {};
+
   constructor(
     private router: Router,
     private cartService: CartService,
-    private productService: ProductService
+    private productService: ProductService,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
     this.loadCart();
   }
 
-  /**
-   * Carga de forma dinámica los productos cuyo ID esté en el carrito.
-   */
   loadCart(): void {
     this.loading = true;
     const productIds = this.cartService.getCartItems();
@@ -50,6 +51,13 @@ export class CartComponent implements OnInit {
 
     forkJoin(observables).subscribe(results => {
       this.cartProducts = (results.filter(prod => prod !== null) as Product[]);
+
+      this.cartProducts.forEach(prod => {
+        if (this.cartQuantities[prod.id] === undefined) {
+          this.cartQuantities[prod.id] = 1;
+        }
+      });
+
       this.calculateTotal();
       this.loading = false;
     });
@@ -57,8 +65,9 @@ export class CartComponent implements OnInit {
 
   calculateTotal(): void {
     this.totalAmount = this.cartProducts.reduce((total, product) => {
+      const qty = this.cartQuantities[product.id] || 1;
       const priceNum = Number(product.price);
-      return isNaN(priceNum) ? total : total + priceNum;
+      return isNaN(priceNum) ? total : total + priceNum * qty;
     }, 0);
   }
 
@@ -90,9 +99,58 @@ export class CartComponent implements OnInit {
     event.target.src = 'assets/img/ecommerce_icon.jpg';
   }
 
-  proceedToCheckout(): void {
-    if (this.cartProducts.length > 0) {
-      this.router.navigate(['/checkout']);
+  increaseCartQuantity(product: Product): void {
+    if (this.cartQuantities[product.id] < product.stock) {
+      this.cartQuantities[product.id]++;
+      this.calculateTotal();
     }
+  }
+
+  decreaseCartQuantity(product: Product): void {
+    if (this.cartQuantities[product.id] > 1) {
+      this.cartQuantities[product.id]--;
+      this.calculateTotal();
+    }
+  }
+
+  createOrderProducts(): void {
+    if (this.cartProducts.length === 0) {
+      return;
+    }
+
+    const payload = this.cartProducts.map(prod => ({
+      id: prod.id,
+      quantity: this.cartQuantities[prod.id] || 1
+    }));
+
+    this.cartService.createOrder(payload).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.snackBar.open('¡Pedido registrado exitosamente!', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom'
+          });
+          this.cartService.clearCart();
+          this.cartProducts = [];
+          this.cartQuantities = {};
+          this.totalAmount = 0;
+          // (Opcional) Redirigir a “Mis Pedidos”:
+          // this.router.navigate(['/home/mis-pedidos']);
+        } else {
+          this.snackBar.open('Error al registrar el pedido', 'Cerrar', {
+            duration: 3000
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al crear pedido:', err);
+        this.snackBar.open(
+          'Ocurrió un error al procesar tu pedido. Intenta nuevamente.',
+          'Cerrar',
+          {duration: 4000}
+        );
+      }
+    });
   }
 }

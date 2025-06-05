@@ -32,6 +32,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   cartProductIds: number[] = [];
   private destroy$ = new Subject<void>();
 
+  quantities: { [productId: number]: number } = {};
+
   availableSortFields = [
     { value: 'name', display: 'Nombre' },
     { value: 'price', display: 'Precio' },
@@ -119,6 +121,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
         if (response.success) {
           this.products = response.data;
 
+          this.products.forEach(prod => {
+            if (this.quantities[prod.id] === undefined) {
+              this.quantities[prod.id] = 1;
+            }
+          });
+
           if (response.meta) {
             this.totalProducts = response.meta.total;
             this.lastPage = response.meta.last_page;
@@ -139,11 +147,48 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  increaseQuantity(product: Product): void {
+    if (this.quantities[product.id] < product.stock) {
+      this.quantities[product.id]++;
+    }
+  }
+
+  decreaseQuantity(product: Product): void {
+    if (this.quantities[product.id] > 1) {
+      this.quantities[product.id]--;
+    }
+  }
+
   openProductDialog(product: Product): void {
     this.dialog.open(ProductDetailDialogComponent, {
       width: '400px',
       data: product
     });
+  }
+
+  toggleCart(product: Product): void {
+    if (this.isInCart(product)) {
+      this.cartService.removeFromCart(product.id);
+      this.snackBar.open(`${product.name} eliminado del carrito`, 'Cerrar', {
+        duration: 2000,
+        horizontalPosition: 'right',
+        verticalPosition: 'bottom'
+      });
+    } else {
+      // Llamamos a addToCart usandola cantidad actual
+      // Para simplificar la lógica de CartService (que solo usa IDs), agregamos la ID.
+      // Pero en createOrderProducts se envía la cantidad real desde cartProducts con cantidades en CartComponent.
+      this.cartService.addToCart(product.id);
+      this.snackBar.open(
+        `${product.name} agregado al carrito (x${this.quantities[product.id]})`,
+        'Cerrar',
+        {
+          duration: 2000,
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
+        }
+      );
+    }
   }
 
   goToPage(page: number): void {
@@ -206,16 +251,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   isInCart(product: Product): boolean {
     return this.cartProductIds.includes(product.id);
-  }
-
-  toggleCart(product: Product): void {
-    if (this.isInCart(product)) {
-      this.cartService.removeFromCart(product.id);
-      this.showMessage(`${product.name} eliminado del carrito`);
-    } else {
-      this.cartService.addToCart(product.id);
-      this.showMessage(`${product.name} agregado al carrito`);
-    }
   }
 
   onImageError(event: Event): void {

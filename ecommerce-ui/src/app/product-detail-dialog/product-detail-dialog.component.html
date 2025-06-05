@@ -3,7 +3,7 @@
 <mat-dialog-content class="dialog-content">
   <div class="image-container">
     <img
-      [src]="data.image_url"
+      [src]="data.image"
       [alt]="data.name"
       (error)="onImageError($event)"
     />
@@ -11,6 +11,7 @@
 
   <div class="details-container">
     <p><strong>Precio:</strong> {{ formatPrice(data.price) }}</p>
+    <p><strong>Stock disponible:</strong> {{ data.stock }}</p>
     <p><strong>Categoría:</strong> {{ data.category?.name || 'Sin categoría' }}</p>
     <p class="description"><strong>Descripción:</strong></p>
     <p>{{ data.description }}</p>

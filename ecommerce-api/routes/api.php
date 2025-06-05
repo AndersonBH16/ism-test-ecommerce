@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\Api\LogoutController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -21,4 +22,6 @@ Route::group([
 
     Route::apiResource('products', ProductController::class);
     Route::get('products/search', [ProductController::class, 'search']);
+
+    Route::post('orders', [OrderController::class, 'store']);
 });

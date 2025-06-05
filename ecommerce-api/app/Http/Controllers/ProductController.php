@@ -91,7 +91,8 @@ class ProductController extends Controller
             'name' => $product->name,
             'description' => $product->description,
             'price' => (float) $product->price,
-            'image_url' => $product->image_url,
+            'image' => $product->image,
+            'stock'       => $product->stock,
             'category' => $product->category ? [
                 'id' => $product->category->id,
                 'name' => $product->category->name
@@ -105,11 +106,11 @@ class ProductController extends Controller
     {
         try {
             $product = Product::with('category')->findOrFail($id);
-            $product = $this->transformProduct($product);
+            $productTransformed = $this->transformProduct($product);
 
             return response()->json([
                 'success' => true,
-                'data' => $product,
+                'data'    => $productTransformed,
                 'message' => 'Producto obtenido exitosamente'
             ], 200);
 
@@ -117,10 +118,11 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Producto no encontrado',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 404);
         }
     }
+
 
     public function search(Request $request): JsonResponse
     {

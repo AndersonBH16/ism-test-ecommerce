@@ -1,4 +1,3 @@
-<!-- src/app/cart/cart.component.html -->
 <div class="cart-container">
   <div class="header">
     <h2>Mi Carrito</h2>
@@ -13,7 +12,6 @@
   </div>
 
   <div *ngIf="!loading" class="cart-content">
-    <!-- Estado vacío -->
     <div *ngIf="!loading && cartProducts.length === 0" class="empty-cart">
       <mat-icon class="empty-icon">shopping_cart</mat-icon>
       <h3>Tu carrito está vacío</h3>
@@ -23,11 +21,10 @@
       </button>
     </div>
 
-    <!-- Lista de productos en carrito -->
     <div *ngIf="cartProducts.length > 0" class="cart-items-container">
       <div class="cart-items-section">
         <div class="cart-actions-header">
-          <button mat-stroked-button color="warn"
+          <button mat-stroked-button
                   (click)="clearCart()"
                   [disabled]="cartProducts.length === 0">
             <mat-icon>delete_sweep</mat-icon>
@@ -40,23 +37,44 @@
                     *ngFor="let product of cartProducts; trackBy: trackByProductId">
             <div class="item-content">
               <div class="item-image">
-                <img [src]="product.image_url"
+                <img [src]="product.image"
                      alt="{{ product.name }}"
                      (error)="onImageError($event)"
                      class="product-image"/>
               </div>
-
               <div class="item-info">
                 <h3 class="item-name">{{ product.name }}</h3>
                 <p class="item-description">{{ product.description }}</p>
-
                 <mat-chip *ngIf="product.category">
                   {{ product.category.name }}
                 </mat-chip>
-
+                <br /><br />
                 <div class="item-price">
                   <span>{{ formatPrice(product.price) }}</span>
                 </div>
+
+                <div class="quantity-selector">
+                  <button mat-mini-fab
+                          color="primary"
+                          (click)="increaseCartQuantity(product)"
+                          [disabled]="cartQuantities[product.id] >= product.stock">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                  <span class="quantity-value">{{ cartQuantities[product.id] }}</span>
+                  <button mat-mini-fab
+                          color="primary"
+                          (click)="increaseCartQuantity(product)"
+                          [disabled]="cartQuantities[product.id] >= product.stock">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+                <p class="stock-info" *ngIf="product.stock > 0">
+                  Stock restante: {{ product.stock }}
+                </p>
+                <p class="out-of-stock" *ngIf="product.stock === 0">
+                  <mat-icon color="warn">block</mat-icon>
+                  <span>Agotado</span>
+                </p>
               </div>
 
               <div class="item-actions">
@@ -71,7 +89,6 @@
         </div>
       </div>
 
-      <!-- Resumen del pedido -->
       <div class="cart-summary-section">
         <mat-card class="cart-summary">
           <mat-card-header>
@@ -98,12 +115,12 @@
           </mat-card-content>
 
           <mat-card-actions align="end">
-            <button mat-raised-button color="primary"
+            <button mat-raised-button
                     class="checkout-btn"
-                    (click)="proceedToCheckout()"
+                    (click)="createOrderProducts()"
                     [disabled]="cartProducts.length === 0">
               <mat-icon>payment</mat-icon>
-              Proceder al Pago
+              Registrar Pedido
             </button>
 
             <button mat-stroked-button color="primary"

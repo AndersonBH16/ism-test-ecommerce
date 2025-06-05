@@ -1,6 +1,6 @@
-// src/app/cart.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +8,9 @@ import { BehaviorSubject } from 'rxjs';
 export class CartService {
   private cartItemsSubject = new BehaviorSubject<number[]>(this.loadCartFromLocalStorage());
   public cartItems$ = this.cartItemsSubject.asObservable();
+  private apiUrl = 'http://localhost:8068/api';
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   private loadCartFromLocalStorage(): number[] {
     const storedCart = localStorage.getItem('cart');
@@ -40,5 +41,17 @@ export class CartService {
 
   getCartItems(): number[] {
     return this.cartItemsSubject.value;
+  }
+
+  createOrder(products: { id: number; quantity: number }[]): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    const body = { products: products };
+
+    return this.http.post(`${this.apiUrl}/orders`, body, { headers: headers });
   }
 }
