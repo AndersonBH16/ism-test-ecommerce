@@ -16,14 +16,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
   selectedCategories: number[] = [];
   searchControl = new FormControl('');
 
-  // --- Ordenamiento ---
-  sortBy = 'created_at';                   // valor inicial por defecto
-  sortOrder: 'asc' | 'desc' = 'desc';      // valor inicial por defecto
+  sortBy = 'created_at';
+  sortOrder: 'asc' | 'desc' = 'desc';
 
   loading = true;
   error = '';
 
-  // --- Paginación clásica ---
   currentPage = 1;
   perPage = 12;
   lastPage = 1;
@@ -52,7 +50,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🚀 Iniciando ProductsComponent con ordenamiento + paginación');
     this.loadCategories();
     this.loadProducts(true);
     this.setupSearch();
@@ -115,12 +112,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
       sort_order: this.sortOrder
     };
 
-    console.log('📤 Petición con parámetros:', params);
-
     this.productService.getProducts(params).subscribe({
       next: (response) => {
-        console.log('📥 Respuesta API:', response);
-
         if (response.success) {
           this.products = response.data;
 
@@ -137,7 +130,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.loading = false;
       },
       error: (error) => {
-        console.error('❌ Error de conexión:', error);
         this.error = 'Error al conectar con el servidor';
         this.loading = false;
         this.showMessage('Error al cargar los productos');

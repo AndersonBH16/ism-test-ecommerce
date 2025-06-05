@@ -1,3 +1,101 @@
+/* ------ Estilos base de la barra (sin cambios) ------ */
+.toolbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.app-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* ---------------------------------------------------- */
+/*  Diseño mejorado para el icono del carrito con gradient y animación */
+/* ---------------------------------------------------- */
+.cart-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff8a00 0%, #e52e71 100%);
+  color: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cart-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(229, 46, 113, 0.4);
+}
+
+.cart-icon__icon {
+  font-size: 24px;
+}
+
+/* Insignia (badge) con animación de “pulso” */
+
+.cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle, #ffe600 0%, #ff0000 100%);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: badge-pulse 1.5s infinite ease-in-out;
+}
+
+/* Keyframes para la animación de pulso */
+@keyframes badge-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Opcional: separador entre los mat‐select de orden y el cart si los hubiera */
+.toolbar .cart-icon {
+  margin-right: 1rem;
+}
+
+/* ---------------------------------------------------- */
+/*  Ajustes opcionales para el nombre de usuario (userName) */
+/* ---------------------------------------------------- */
+button[mat-button] {
+  text-transform: none;
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------- */
+
+
+/*
+
+
+
 .toolbar {
   background-color: #ffffff;
   border-bottom: 1px solid #dee2e6;
@@ -16,3 +114,53 @@
 .spacer {
   flex: 1 1 auto;
 }
+
+
+.cart-icon {
+  position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff6a00, #ee0979);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cart-icon__icon {
+  color: white;
+  font-size: 24px;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff3d00;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(255, 61, 0, 0.7);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 61, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 61, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 61, 0, 0);
+  }
+}
+
+ */

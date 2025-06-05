@@ -386,3 +386,44 @@
   width: 200px;
 }
 
+/* --- Estilo para "Agregar al carrito" (ya lo tenías) --- */
+.add-to-cart-btn {
+  background: linear-gradient(45deg, #2196f3, #21cbf3);
+  color: white;
+  border-radius: 25px;
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+  background: linear-gradient(45deg, #1976d2, #0288d1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.add-to-cart-btn mat-icon {
+  margin-right: 8px;
+}
+
+/* --- NUEVO: Estilo para "Quitar del carrito" --- */
+.remove-from-cart-btn {
+  background: linear-gradient(45deg, #e91e63, #f48fb1);
+  color: white;
+  border-radius: 25px;
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.remove-from-cart-btn:hover {
+  background: linear-gradient(45deg, #c2185b, #f06292);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+}
+
+.remove-from-cart-btn mat-icon {
+  margin-right: 8px;
+}
+
+

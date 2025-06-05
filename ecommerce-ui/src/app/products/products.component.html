@@ -155,14 +155,21 @@
           <div class="price-section">
             <span class="price">{{ formatPrice(product.price) }}</span>
           </div>
+
+          <!--
+            Usamos [ngClass] para asignar la clase en base a isInCart(product):
+            - Si está en el carrito: 'remove-from-cart-btn'
+            - Si NO está: 'add-to-cart-btn'
+            Además, mantenemos [color]="..." para el color primario de Angular Material.
+          -->
           <button
             mat-raised-button
+            [ngClass]="isInCart(product) ? 'remove-from-cart-btn' : 'add-to-cart-btn'"
             [color]="isInCart(product) ? 'warn' : 'primary'"
-            class="add-to-cart-btn"
             (click)="toggleCart(product)"
             [matTooltip]="
-              isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'
-            "
+      isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'
+    "
           >
             <mat-icon>
               {{ isInCart(product) ? 'remove_shopping_cart' : 'add_shopping_cart' }}
@@ -170,6 +177,7 @@
             {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
           </button>
         </mat-card-actions>
+
       </mat-card>
     </div>
 
