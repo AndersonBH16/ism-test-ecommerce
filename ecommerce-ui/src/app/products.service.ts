@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Product {
@@ -14,11 +14,34 @@ export interface Product {
   };
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  description?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
   error?: string;
+  meta?: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+    from: number;
+    to: number;
+  };
+}
+
+export interface ProductFilters {
+  page?: number;
+  per_page?: number;
+  search?: string;
+  categories?: number[];
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
 }
 
 @Injectable({
@@ -37,28 +60,94 @@ export class ProductService {
     });
   }
 
-  getAllProducts(): Observable<ApiResponse<Product[]>> {
+  private buildParams(filters: ProductFilters): HttpParams {
+    let params = new HttpParams();
+
+    if (filters.page) {
+      params = params.set('page', filters.page.toString());
+    }
+
+    if (filters.per_page) {
+      params = params.set('per_page', filters.per_page.toString());
+    }
+
+    if (filters.search && filters.search.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.categories && filters.categories.length > 0) {
+      filters.categories.forEach(categoryId => {
+        params = params.append('categories[]', categoryId.toString());
+      });
+    }
+
+    if (filters.sort_by) {
+      params = params.set('sort_by', filters.sort_by);
+    }
+
+    if (filters.sort_order) {
+      params = params.set('sort_order', filters.sort_order);
+    }
+
+    return params;
+  }
+
+  // Método principal para obtener productos con filtros y paginación
+  getProducts(filters: ProductFilters = {}): Observable<ApiResponse<Product[]>> {
+    const params = this.buildParams(filters);
+
     return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}/products`, {
+      headers: this.getHeaders(),
+      params: params
+    });
+  }
+
+  // Método legacy para compatibilidad
+  getAllProducts(): Observable<ApiResponse<Product[]>> {
+    return this.getProducts();
+  }
+
+  // Obtener un producto específico
+  getProduct(id: number): Observable<ApiResponse<Product>> {
+    return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/products/${id}`, {
       headers: this.getHeaders()
     });
   }
 
-  addToCart(productId: number, quantity: number = 1): Observable<ApiResponse<any>> {
-    const body = {
-      product_id: productId,
-      quantity: quantity
-    };
+  // Búsqueda específica (método adicional si necesitas lógica diferente)
+  searchProducts(searchTerm: string): Observable<ApiResponse<Product[]>> {
+    const params = new HttpParams().set('search', searchTerm);
 
+    return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}/products/search`, {
+      headers: this.getHeaders(),
+      params: params
+    });
+  }
+
+  // Obtener categorías
+  getCategories(): Observable<ApiResponse<Category[]>> {
+    return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/categories`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Obtener una categoría específica
+  getCategory(id: number): Observable<ApiResponse<Category>> {
+    return this.http.get<ApiResponse<Category>>(`${this.apiUrl}/categories/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Métodos para carrito y wishlist
+  addToCart(productId: number, quantity: number = 1): Observable<ApiResponse<any>> {
+    const body = { product_id: productId, quantity: quantity };
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/cart/add`, body, {
       headers: this.getHeaders()
     });
   }
 
   addToWishlist(productId: number): Observable<ApiResponse<any>> {
-    const body = {
-      product_id: productId
-    };
-
+    const body = { product_id: productId };
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/wishlist/add`, body, {
       headers: this.getHeaders()
     });

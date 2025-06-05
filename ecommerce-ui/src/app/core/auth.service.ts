@@ -58,8 +58,4 @@ export class AuthService {
       return false;
     }
   }
-
-  clearToken(): void {
-    localStorage.removeItem('token');
-  }
 }

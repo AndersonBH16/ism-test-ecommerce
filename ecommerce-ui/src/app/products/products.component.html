@@ -1,72 +1,174 @@
 <div class="products-container">
+  <!-- Header con búsqueda -->
   <div class="header">
-    <h2>Productos</h2>
-    <p class="subtitle">Descubre nuestra increíble selección de productos</p>
+    <div class="header-content">
+      <div class="title-section">
+        <h2>Productos</h2>
+        <br>
+        <p class="subtitle">Descubre nuestra increíble selección de productos</p>
+      </div>
+      <br>
+      <div class="search-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar productos...</mat-label>
+          <input
+            matInput
+            [formControl]="searchControl"
+            #searchInput
+            placeholder="Buscar por nombre o descripción"
+          >
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+  <div class="filters-section" *ngIf="categories.length > 0">
+    <div class="filters-header">
+      <h3>
+        <mat-icon>filter_list</mat-icon>
+        Filtrar por categorías
+      </h3>
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="clearAllFilters()"
+        *ngIf="selectedCategories.length > 0 || searchControl.value"
+      >
+        <mat-icon>clear</mat-icon>
+        Limpiar filtros
+      </button>
+    </div>
+
+    <div class="categories-filter">
+      <mat-chip-listbox multiple>
+        <mat-chip-option
+          *ngFor="let category of categories"
+          [value]="category.id"
+          [selected]="selectedCategories.includes(category.id)"
+          (selectionChange)="onCategoryChange(category.id, $event.selected)"
+        >
+          {{ category.name }}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
   </div>
 
+  <!-- Loading inicial -->
   <div *ngIf="loading" class="loading-container">
-    <mat-spinner></mat-spinner>
+    <mat-spinner diameter="50"></mat-spinner>
     <p>Cargando productos...</p>
   </div>
 
+  <!-- Error -->
   <div *ngIf="error && !loading" class="error-container">
-    <mat-icon>error_outline</mat-icon>
+    <mat-icon color="warn">error_outline</mat-icon>
+    <h3>¡Oops! Algo salió mal</h3>
     <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="loadProducts()">
+    <button mat-raised-button color="primary" (click)="retryLoad()">
+      <mat-icon>refresh</mat-icon>
       Reintentar
     </button>
   </div>
 
-  <div *ngIf="!loading && !error" class="card-grid">
-    <mat-card class="product-card" *ngFor="let product of products">
-      <div class="card-image-container">
-        <img
-          mat-card-image
-          [src]="product.image_url"
-          [alt]="product.name"
-          class="product-image"
-          (error)="onImageError($event)"
-        />
-        <div class="card-overlay">
-          <button
-            mat-fab
-            class="wishlist-btn"
-            matTooltip="Agregar a favoritos"
-          >
-            <mat-icon>favorite_border</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <mat-card-content class="card-content">
-        <h3 class="product-name">{{ product.name }}</h3>
-        <p class="product-description">{{ product.description }}</p>
-        <div class="category-tag" *ngIf="product.category">
-          <mat-icon>label</mat-icon>
-          <span>{{ product.category.name }}</span>
-        </div>
-      </mat-card-content>
-
-      <mat-card-actions class="card-actions">
-        <div class="price-section">
-          <span class="price">{{ formatPrice(product.price) }}</span>
-        </div>
-        <button
-          mat-raised-button
-          color="primary"
-          class="add-to-cart-btn"
-          (click)="toggleCart(product)"
-        >
-          <mat-icon>shopping_cart</mat-icon>
-          {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
-        </button>
-      </mat-card-actions>
-    </mat-card>
+  <!-- Resultados de búsqueda -->
+  <div *ngIf="!loading && !error && (searchControl.value || selectedCategories.length > 0)" class="search-results">
+    <p class="results-info">
+      <mat-icon>info</mat-icon>
+      Mostrando {{ products.length }} resultado(s)
+      <span *ngIf="searchControl.value"> para "<strong>{{ searchControl.value }}</strong>"</span>
+      <span *ngIf="selectedCategories.length > 0"> en las categorías seleccionadas</span>
+    </p>
   </div>
 
-  <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
-    <mat-icon>inventory_2</mat-icon>
-    <h3>No hay productos disponibles</h3>
-    <p>Vuelve más tarde para ver nuevos productos</p>
+  <!-- Grid de productos -->
+  <div *ngIf="!loading && !error" class="products-grid">
+    <div class="card-grid">
+      <mat-card
+        class="product-card"
+        *ngFor="let product of products; trackBy: trackByProductId"
+      >
+        <div class="card-image-container">
+          <img
+            mat-card-image
+            [src]="product.image_url"
+            [alt]="product.name"
+            class="product-image"
+            (error)="onImageError($event)"
+            loading="lazy"
+          />
+          <div class="card-overlay">
+            <button
+              mat-fab
+              class="wishlist-btn"
+              matTooltip="Agregar a favoritos"
+              matTooltipPosition="left"
+            >
+              <mat-icon>favorite_border</mat-icon>
+            </button>
+          </div>
+          <div class="category-badge" *ngIf="product.category">
+            <mat-chip>{{ product.category.name }}</mat-chip>
+          </div>
+        </div>
+
+        <mat-card-content class="card-content">
+          <h3 class="product-name" [matTooltip]="product.name">
+            {{ product.name }}
+          </h3>
+          <p class="product-description" [matTooltip]="product.description">
+            {{ product.description }}
+          </p>
+        </mat-card-content>
+
+        <mat-card-actions class="card-actions">
+          <div class="price-section">
+            <span class="price">{{ formatPrice(product.price) }}</span>
+          </div>
+          <button
+            mat-raised-button
+            [color]="isInCart(product) ? 'warn' : 'primary'"
+            class="add-to-cart-btn"
+            (click)="toggleCart(product)"
+            [matTooltip]="isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'"
+          >
+            <mat-icon>{{ isInCart(product) ? 'remove_shopping_cart' : 'add_shopping_cart' }}</mat-icon>
+            {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- Loading más productos -->
+    <div *ngIf="loadingMore" class="loading-more">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando más productos...</p>
+    </div>
+
+    <!-- No hay más productos -->
+    <div *ngIf="!hasMoreProducts && products.length > 0" class="no-more-products">
+      <mat-icon>check_circle</mat-icon>
+      <p>Has visto todos los productos disponibles</p>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
+      <mat-icon>search_off</mat-icon>
+      <h3>No encontramos productos</h3>
+      <p *ngIf="searchControl.value || selectedCategories.length > 0">
+        Intenta ajustar tus filtros de búsqueda
+      </p>
+      <p *ngIf="!searchControl.value && selectedCategories.length === 0">
+        Vuelve más tarde para ver nuevos productos
+      </p>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="clearAllFilters()"
+        *ngIf="searchControl.value || selectedCategories.length > 0"
+      >
+        <mat-icon>clear</mat-icon>
+        Limpiar filtros
+      </button>
+    </div>
   </div>
 </div>

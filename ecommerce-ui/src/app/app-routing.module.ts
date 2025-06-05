@@ -5,6 +5,7 @@ import { ProductsComponent } from "./products/products.component";
 import { CartComponent } from "./cart/cart.component";
 import { HomeComponent } from "./pages/home/home.component";
 import { authGuard } from './core/auth.guard';
+import {DashboardComponent} from "./pages/home/dashboard/dashboard.component";
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -14,7 +15,8 @@ const routes: Routes = [
     component: HomeComponent,
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'productos', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
       { path: 'productos', component: ProductsComponent },
       { path: 'buycart', component: CartComponent }
     ]
@@ -27,3 +29,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+

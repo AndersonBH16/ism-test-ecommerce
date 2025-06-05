@@ -19,7 +19,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FormsModule } from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { ProductsComponent } from './products/products.component';
 import { HomeModule } from "./pages/home/home.module";
 import { CartComponent } from './cart/cart.component';
@@ -27,6 +27,11 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
 import {MatDialogModule} from "@angular/material/dialog";
 import { CartBadgeComponent } from './cart-badge/cart-badge.component';
 import {MatChipsModule} from "@angular/material/chips";
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatSelectModule} from "@angular/material/select";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
+import {MatBadgeModule} from "@angular/material/badge";
 
 @NgModule({
   declarations: [
@@ -56,7 +61,13 @@ import {MatChipsModule} from "@angular/material/chips";
     MatSnackBarModule,
     MatTooltipModule,
     MatDialogModule,
-    MatChipsModule
+    MatChipsModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatCheckboxModule,
+    MatSelectModule,
+    MatProgressBarModule,
+    MatBadgeModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }

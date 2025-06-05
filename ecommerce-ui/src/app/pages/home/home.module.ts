@@ -11,11 +11,16 @@ import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
 import {TopbarModule} from "./topbar/topbar.module";
 import {SidebarModule} from "./sidebar/sidebar.module";
+import { DashboardComponent } from './dashboard/dashboard.component';
+import {MatCardModule} from "@angular/material/card";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 
 @NgModule({
   declarations: [
-    HomeComponent
+    HomeComponent,
+    DashboardComponent
   ],
   imports: [
     CommonModule,
@@ -28,6 +33,9 @@ import {SidebarModule} from "./sidebar/sidebar.module";
     MatIconModule,
     TopbarModule,
     SidebarModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
   ]
 })
 export class HomeModule { }
