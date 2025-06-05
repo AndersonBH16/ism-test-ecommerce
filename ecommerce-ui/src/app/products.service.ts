@@ -92,7 +92,6 @@ export class ProductService {
     return params;
   }
 
-  // Método principal para obtener productos con filtros y paginación
   getProducts(filters: ProductFilters = {}): Observable<ApiResponse<Product[]>> {
     const params = this.buildParams(filters);
 
@@ -102,19 +101,16 @@ export class ProductService {
     });
   }
 
-  // Método legacy para compatibilidad
   getAllProducts(): Observable<ApiResponse<Product[]>> {
     return this.getProducts();
   }
 
-  // Obtener un producto específico
   getProduct(id: number): Observable<ApiResponse<Product>> {
     return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/products/${id}`, {
       headers: this.getHeaders()
     });
   }
 
-  // Búsqueda específica (método adicional si necesitas lógica diferente)
   searchProducts(searchTerm: string): Observable<ApiResponse<Product[]>> {
     const params = new HttpParams().set('search', searchTerm);
 
@@ -124,21 +120,18 @@ export class ProductService {
     });
   }
 
-  // Obtener categorías
   getCategories(): Observable<ApiResponse<Category[]>> {
     return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/categories`, {
       headers: this.getHeaders()
     });
   }
 
-  // Obtener una categoría específica
   getCategory(id: number): Observable<ApiResponse<Category>> {
     return this.http.get<ApiResponse<Category>>(`${this.apiUrl}/categories/${id}`, {
       headers: this.getHeaders()
     });
   }
 
-  // Métodos para carrito y wishlist
   addToCart(productId: number, quantity: number = 1): Observable<ApiResponse<any>> {
     const body = { product_id: productId, quantity: quantity };
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/cart/add`, body, {

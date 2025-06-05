@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -13,7 +14,7 @@ class ProductController extends Controller
         try {
             $query = Product::with('category');
 
-            // Búsqueda por texto
+            // Filtros de búsqueda...
             if ($request->has('search') && !empty($request->search)) {
                 $searchTerm = $request->search;
                 $query->where(function($q) use ($searchTerm) {
@@ -22,7 +23,7 @@ class ProductController extends Controller
                 });
             }
 
-            // Filtrar por categorías
+            // Filtro por categorías...
             if ($request->has('categories') && is_array($request->categories)) {
                 $categories = array_filter($request->categories);
                 if (!empty($categories)) {
@@ -30,50 +31,46 @@ class ProductController extends Controller
                 }
             }
 
-            // Ordenamiento
+            // Orden y ordenamiento
             $sortBy = $request->get('sort_by', 'created_at');
             $sortOrder = $request->get('sort_order', 'desc');
-
             $allowedSorts = ['name', 'price', 'created_at', 'updated_at'];
             if (in_array($sortBy, $allowedSorts)) {
                 $query->orderBy($sortBy, $sortOrder);
             }
 
-            // Paginación
-            $perPage = $request->get('per_page', 4);
-            $perPage = min($perPage, 50); // Máximo 50 por página
+            // Paginación (per_page viene de Angular)
+            $perPage = $request->get('per_page', 12);
+            $perPage = min($perPage, 50); // tope máximo de 50
 
             if ($request->has('page')) {
                 $products = $query->paginate($perPage);
-
-                // Transformar productos
                 $products->getCollection()->transform(function ($product) {
                     return $this->transformProduct($product);
                 });
 
                 return response()->json([
                     'success' => true,
-                    'data' => $products->items(),
-                    'meta' => [
+                    'data'    => $products->items(),
+                    'meta'    => [
                         'current_page' => $products->currentPage(),
-                        'per_page' => $products->perPage(),
-                        'total' => $products->total(),
-                        'last_page' => $products->lastPage(),
-                        'from' => $products->firstItem(),
-                        'to' => $products->lastItem(),
+                        'per_page'     => $products->perPage(),
+                        'total'        => $products->total(),
+                        'last_page'    => $products->lastPage(),
+                        'from'         => $products->firstItem(),
+                        'to'           => $products->lastItem(),
                     ],
                     'message' => 'Productos obtenidos exitosamente'
                 ], 200);
             } else {
-                // Sin paginación (para compatibilidad)
+                // Si no hay page, devuelve un simple limit()
                 $products = $query->limit($perPage)->get();
                 $products->transform(function ($product) {
                     return $this->transformProduct($product);
                 });
-
                 return response()->json([
                     'success' => true,
-                    'data' => $products,
+                    'data'    => $products,
                     'message' => 'Productos obtenidos exitosamente'
                 ], 200);
             }
@@ -82,9 +79,27 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener los productos',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
+    }
+
+
+    private function transformProduct($product): array
+    {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => (float) $product->price,
+            'image_url' => $product->image_url,
+            'category' => $product->category ? [
+                'id' => $product->category->id,
+                'name' => $product->category->name
+            ] : null,
+            'created_at' => $product->created_at,
+            'updated_at' => $product->updated_at
+        ];
     }
 
     public function show($id): JsonResponse
@@ -147,16 +162,5 @@ class ProductController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
-
-    private function transformProduct($product)
-    {
-        if ($product->image) {
-            $product->image_url = asset('storage/' . $product->image);
-        } else {
-            $product->image_url = asset('images/no-image.jpg');
-        }
-
-        return $product;
     }
 }

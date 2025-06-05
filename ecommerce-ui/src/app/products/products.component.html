@@ -3,24 +3,28 @@
     <div class="header-content">
       <div class="title-section">
         <h2>Productos</h2>
-        <br>
-        <p class="subtitle">Bienvenido! Descubre nuestros mejores productos al mejor precio.</p>
+        <br />
+        <p class="subtitle">
+          Bienvenido! Descubre nuestros mejores productos al mejor precio.
+        </p>
       </div>
-      <br>
+      <br />
       <div class="search-section">
         <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar productos...</mat-label>
+          <mat-label>Busca productos</mat-label>
           <input
             matInput
             [formControl]="searchControl"
             #searchInput
             placeholder="Buscar por nombre o descripción"
-          >
+          />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
       </div>
     </div>
   </div>
+
+  <!-- Filtros de categorías -->
   <div class="filters-section" *ngIf="categories.length > 0">
     <div class="filters-header">
       <h3>
@@ -52,6 +56,28 @@
     </div>
   </div>
 
+  <!-- CONTROLES DE ORDENAMIENTO -->
+  <div class="sort-section" *ngIf="!loading && !error">
+    <mat-form-field appearance="outline" class="sort-field">
+      <mat-label>Ordenar por</mat-label>
+      <mat-select [value]="sortBy" (selectionChange)="onSortByChange($event.value)">
+        <mat-option *ngFor="let opt of availableSortFields" [value]="opt.value">
+          {{ opt.display }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sort-field">
+      <mat-label>Dirección</mat-label>
+      <mat-select [value]="sortOrder" (selectionChange)="onSortOrderChange($event.value)">
+        <mat-option *ngFor="let dir of availableSortOrders" [value]="dir.value">
+          {{ dir.display }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <!-- FIN CONTROLES DE ORDENAMIENTO -->
+
   <div *ngIf="loading" class="loading-container">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Cargando productos...</p>
@@ -67,12 +93,19 @@
     </button>
   </div>
 
-  <div *ngIf="!loading && !error && (searchControl.value || selectedCategories.length > 0)" class="search-results">
+  <div
+    *ngIf="!loading && !error && (searchControl.value || selectedCategories.length > 0)"
+    class="search-results"
+  >
     <p class="results-info">
       <mat-icon>info</mat-icon>
       Mostrando {{ products.length }} resultado(s)
-      <span *ngIf="searchControl.value"> para "<strong>{{ searchControl.value }}</strong>"</span>
-      <span *ngIf="selectedCategories.length > 0"> en las categorías seleccionadas</span>
+      <span *ngIf="searchControl.value">
+        para "<strong>{{ searchControl.value }}</strong>"
+      </span>
+      <span *ngIf="selectedCategories.length > 0">
+        en las categorías seleccionadas
+      </span>
     </p>
   </div>
 
@@ -127,48 +160,35 @@
             [color]="isInCart(product) ? 'warn' : 'primary'"
             class="add-to-cart-btn"
             (click)="toggleCart(product)"
-            [matTooltip]="isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'"
+            [matTooltip]="
+              isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'
+            "
           >
-            <mat-icon>{{ isInCart(product) ? 'remove_shopping_cart' : 'add_shopping_cart' }}</mat-icon>
+            <mat-icon>
+              {{ isInCart(product) ? 'remove_shopping_cart' : 'add_shopping_cart' }}
+            </mat-icon>
             {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
           </button>
         </mat-card-actions>
       </mat-card>
     </div>
 
-    <!-- Loading más productos -->
-    <div *ngIf="loadingMore" class="loading-more">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Cargando más productos...</p>
-    </div>
+    <!-- Paginación clásica -->
+    <div class="pagination-controls">
+      <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">
+        <mat-icon>chevron_left</mat-icon>
+        Anterior
+      </button>
 
-    <!-- No hay más productos -->
-    <div *ngIf="!hasMoreProducts && products.length > 0" class="no-more-products">
-      <mat-icon>check_circle</mat-icon>
-      <p>Has visto todos los productos disponibles</p>
-    </div>
+      <span class="page-info">
+        Página {{ currentPage }} de {{ lastPage }}
+      </span>
 
-    <!-- Estado vacío -->
-    <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
-      <mat-icon>search_off</mat-icon>
-      <p *ngIf="searchControl.value || selectedCategories.length > 0">
-        No se encontraron productos con los filtros actuales.
-      </p>
-      <p *ngIf="searchControl.value || selectedCategories.length > 0">
-        Intenta ajustar tus filtros de búsqueda
-      </p>
-      <p *ngIf="!searchControl.value && selectedCategories.length === 0">
-        Vuelve más tarde para ver nuevos productos
-      </p>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="clearAllFilters()"
-        *ngIf="searchControl.value || selectedCategories.length > 0"
-      >
-        <mat-icon>clear</mat-icon>
-        Limpiar filtros
+      <button mat-button (click)="nextPage()" [disabled]="currentPage === lastPage">
+        Siguiente
+        <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
+    <!-- Fin paginación -->
   </div>
 </div>

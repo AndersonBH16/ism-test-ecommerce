@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Product, ProductService, Category } from "../products.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
@@ -11,26 +11,39 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
   styleUrls: ['./products.component.css']
 })
 export class ProductsComponent implements OnInit, OnDestroy {
-  @ViewChild('searchInput') searchInput!: ElementRef;
-
   products: Product[] = [];
   categories: Category[] = [];
   selectedCategories: number[] = [];
   searchControl = new FormControl('');
 
-  loading = true;
-  loadingMore = false;
-  error = '';
-  hasMoreProducts = true;
+  // --- Ordenamiento ---
+  sortBy = 'created_at';                   // valor inicial por defecto
+  sortOrder: 'asc' | 'desc' = 'desc';      // valor inicial por defecto
 
-  // Paginación
+  loading = true;
+  error = '';
+
+  // --- Paginación clásica ---
   currentPage = 1;
   perPage = 12;
+  lastPage = 1;
   totalProducts = 0;
 
   cartProductIds: number[] = [];
-
   private destroy$ = new Subject<void>();
+
+  // Opciones de orden que mostramos en la vista
+  availableSortFields = [
+    { value: 'name', display: 'Nombre' },
+    { value: 'price', display: 'Precio' },
+    { value: 'created_at', display: 'Fecha creación' },
+    { value: 'updated_at', display: 'Fecha actualización' }
+  ];
+
+  availableSortOrders = [
+    { value: 'asc', display: 'Ascendente' },
+    { value: 'desc', display: 'Descendente' }
+  ];
 
   constructor(
     private productService: ProductService,
@@ -39,8 +52,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    console.log('🚀 Iniciando ProductsComponent con ordenamiento + paginación');
     this.loadCategories();
-    this.loadProducts();
+    this.loadProducts(true);
     this.setupSearch();
     this.setupCartSubscription();
   }
@@ -48,19 +62,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  @HostListener('window:scroll', ['$event'])
-  onScroll(): void {
-    if (this.loading || this.loadingMore || !this.hasMoreProducts) return;
-
-    const scrollPosition = window.pageYOffset + window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-
-    // Cargar más cuando esté cerca del final (200px antes)
-    if (scrollPosition >= documentHeight - 200) {
-      this.loadMoreProducts();
-    }
   }
 
   setupSearch(): void {
@@ -71,7 +72,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.resetAndSearch();
+        this.goToPage(1);
       });
   }
 
@@ -91,103 +92,92 @@ export class ProductsComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        console.error('Error al cargar categorías:', error);
+        console.error('Error al cargar categorías', error);
       }
     });
   }
 
-  loadProducts(reset: boolean = true): void {
+  loadProducts(reset: boolean = false): void {
     if (reset) {
       this.loading = true;
-      this.currentPage = 1;
-      this.products = [];
-      this.hasMoreProducts = true;
-    } else {
-      this.loadingMore = true;
+      this.error = '';
     }
 
     const params = {
       page: this.currentPage,
       per_page: this.perPage,
       search: this.searchControl.value || '',
-      categories: this.selectedCategories.length > 0 ? this.selectedCategories : undefined
+      categories:
+        this.selectedCategories.length > 0
+          ? this.selectedCategories
+          : undefined,
+      sort_by: this.sortBy,
+      sort_order: this.sortOrder
     };
+
+    console.log('📤 Petición con parámetros:', params);
 
     this.productService.getProducts(params).subscribe({
       next: (response) => {
-        if (response.success) {
-          if (reset) {
-            this.products = response.data;
-          } else {
-            this.products = [...this.products, ...response.data];
-          }
+        console.log('📥 Respuesta API:', response);
 
-          // Actualizar información de paginación
+        if (response.success) {
+          this.products = response.data;
+
           if (response.meta) {
             this.totalProducts = response.meta.total;
-            this.hasMoreProducts = this.currentPage < response.meta.last_page;
+            this.lastPage = response.meta.last_page;
           } else {
-            // Si no hay meta, asumir que no hay más productos si recibimos menos del límite
-            this.hasMoreProducts = response.data.length === this.perPage;
+            this.lastPage = 1;
           }
         } else {
-          this.error = response.message || 'Error al cargar los productos';
+          this.error = response.message || 'Error al cargar productos';
         }
 
         this.loading = false;
-        this.loadingMore = false;
       },
       error: (error) => {
-        console.error('Error:', error);
+        console.error('❌ Error de conexión:', error);
         this.error = 'Error al conectar con el servidor';
         this.loading = false;
-        this.loadingMore = false;
         this.showMessage('Error al cargar los productos');
       }
     });
   }
 
-  loadMoreProducts(): void {
-    if (this.loadingMore || !this.hasMoreProducts) return;
-
-    this.loadingMore = true;
-    this.currentPage += 1; // ✅ Asegúrate de incrementar aquí
-
-    const params = {
-      page: this.currentPage,
-      per_page: this.perPage,
-      search: this.searchControl.value || '',
-      categories: this.selectedCategories.length > 0 ? this.selectedCategories : undefined
-    };
-
-    this.productService.getProducts(params).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.products = [...this.products, ...response.data];
-
-          if (response.meta) {
-            this.totalProducts = response.meta.total;
-            this.hasMoreProducts = this.currentPage < response.meta.last_page;
-          } else {
-            this.hasMoreProducts = response.data.length === this.perPage;
-          }
-        } else {
-          this.error = response.message || 'Error al cargar los productos';
-        }
-
-        this.loadingMore = false;
-      },
-      error: (error) => {
-        console.error('Error al cargar más productos:', error);
-        this.loadingMore = false;
-      }
-    });
+  // Navegación entre páginas
+  goToPage(page: number): void {
+    if (page < 1 || page > this.lastPage) {
+      return;
+    }
+    this.currentPage = page;
+    this.loadProducts(true);
   }
 
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadProducts(true);
+    }
+  }
 
-  resetAndSearch(): void {
-    this.currentPage = 1;
-    this.loadProducts(true);
+  nextPage(): void {
+    if (this.currentPage < this.lastPage) {
+      this.currentPage++;
+      this.loadProducts(true);
+    }
+  }
+
+  // Se invoca cuando cambia el campo de orden
+  onSortByChange(newSortBy: string): void {
+    this.sortBy = newSortBy;
+    this.goToPage(1);
+  }
+
+  // Se invoca cuando cambia la dirección del orden
+  onSortOrderChange(newSortOrder: 'asc' | 'desc'): void {
+    this.sortOrder = newSortOrder;
+    this.goToPage(1);
   }
 
   onCategoryChange(categoryId: number, selected: boolean): void {
@@ -196,16 +186,17 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.selectedCategories.push(categoryId);
       }
     } else {
-      this.selectedCategories = this.selectedCategories.filter(id => id !== categoryId);
+      this.selectedCategories = this.selectedCategories.filter(
+        (id) => id !== categoryId
+      );
     }
-
-    this.resetAndSearch();
+    this.goToPage(1);
   }
 
   clearAllFilters(): void {
     this.searchControl.setValue('');
     this.selectedCategories = [];
-    this.resetAndSearch();
+    this.goToPage(1);
   }
 
   retryLoad(): void {
