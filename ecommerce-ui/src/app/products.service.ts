@@ -101,47 +101,14 @@ export class ProductService {
     });
   }
 
-  getAllProducts(): Observable<ApiResponse<Product[]>> {
-    return this.getProducts();
-  }
-
   getProduct(id: number): Observable<ApiResponse<Product>> {
     return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/products/${id}`, {
       headers: this.getHeaders()
     });
   }
 
-  searchProducts(searchTerm: string): Observable<ApiResponse<Product[]>> {
-    const params = new HttpParams().set('search', searchTerm);
-
-    return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}/products/search`, {
-      headers: this.getHeaders(),
-      params: params
-    });
-  }
-
   getCategories(): Observable<ApiResponse<Category[]>> {
     return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/categories`, {
-      headers: this.getHeaders()
-    });
-  }
-
-  getCategory(id: number): Observable<ApiResponse<Category>> {
-    return this.http.get<ApiResponse<Category>>(`${this.apiUrl}/categories/${id}`, {
-      headers: this.getHeaders()
-    });
-  }
-
-  addToCart(productId: number, quantity: number = 1): Observable<ApiResponse<any>> {
-    const body = { product_id: productId, quantity: quantity };
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/cart/add`, body, {
-      headers: this.getHeaders()
-    });
-  }
-
-  addToWishlist(productId: number): Observable<ApiResponse<any>> {
-    const body = { product_id: productId };
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/wishlist/add`, body, {
       headers: this.getHeaders()
     });
   }

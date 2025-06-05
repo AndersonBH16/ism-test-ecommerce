@@ -32,6 +32,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatSelectModule} from "@angular/material/select";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatBadgeModule} from "@angular/material/badge";
+import {ProductDetailDialogComponent} from "./product-detail-dialog/product-detail-dialog.component";
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import {MatBadgeModule} from "@angular/material/badge";
     ProductsComponent,
     CartComponent,
     ConfirmDialogComponent,
-    CartBadgeComponent
+    CartBadgeComponent,
+    ProductDetailDialogComponent
   ],
   imports: [
     BrowserModule,

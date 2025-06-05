@@ -4,6 +4,8 @@ import { Product, ProductService, Category } from "../products.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { CartService } from "../cart.service";
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import {MatDialog} from "@angular/material/dialog";
+import {ProductDetailDialogComponent} from "../product-detail-dialog/product-detail-dialog.component";
 
 @Component({
   selector: 'app-products',
@@ -30,7 +32,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   cartProductIds: number[] = [];
   private destroy$ = new Subject<void>();
 
-  // Opciones de orden que mostramos en la vista
   availableSortFields = [
     { value: 'name', display: 'Nombre' },
     { value: 'price', display: 'Precio' },
@@ -46,7 +47,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +139,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Navegación entre páginas
+  openProductDialog(product: Product): void {
+    this.dialog.open(ProductDetailDialogComponent, {
+      width: '400px',
+      data: product
+    });
+  }
+
   goToPage(page: number): void {
     if (page < 1 || page > this.lastPage) {
       return;

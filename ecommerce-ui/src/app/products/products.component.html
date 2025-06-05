@@ -109,7 +109,7 @@
     </p>
   </div>
 
-  <!-- Grid de productos -->
+  <!-- Cards de los Productos -->
   <div *ngIf="!loading && !error" class="products-grid">
     <div class="card-grid">
       <mat-card
@@ -141,47 +141,45 @@
             <mat-chip>{{ product.category.name }}</mat-chip>
           </div>
         </div>
-
         <mat-card-content class="card-content">
-          <h3 class="product-name" [matTooltip]="product.name">
-            {{ product.name }}
-          </h3>
-          <p class="product-description" [matTooltip]="product.description">
-            {{ product.description }}
-          </p>
+          <div class="title-with-button">
+            <h3 class="product-name" [matTooltip]="product.name">
+              {{ product.name }}
+            </h3>
+            <button
+              mat-button
+              class="details-btn"
+              (click)="openProductDialog(product)"
+            >
+              <mat-icon>visibility</mat-icon>
+              Ver detalles
+            </button>
+          </div>
         </mat-card-content>
-
         <mat-card-actions class="card-actions">
           <div class="price-section">
             <span class="price">{{ formatPrice(product.price) }}</span>
           </div>
-
-          <!--
-            Usamos [ngClass] para asignar la clase en base a isInCart(product):
-            - Si está en el carrito: 'remove-from-cart-btn'
-            - Si NO está: 'add-to-cart-btn'
-            Además, mantenemos [color]="..." para el color primario de Angular Material.
-          -->
           <button
             mat-raised-button
             [ngClass]="isInCart(product) ? 'remove-from-cart-btn' : 'add-to-cart-btn'"
             [color]="isInCart(product) ? 'warn' : 'primary'"
             (click)="toggleCart(product)"
             [matTooltip]="
-      isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'
-    "
+            isInCart(product) ? 'Quitar del carrito' : 'Agregar al carrito'
+          "
           >
             <mat-icon>
-              {{ isInCart(product) ? 'remove_shopping_cart' : 'add_shopping_cart' }}
+              {{ isInCart(product)
+              ? 'remove_shopping_cart'
+              : 'add_shopping_cart' }}
             </mat-icon>
             {{ isInCart(product) ? 'Quitar' : 'Agregar' }}
           </button>
         </mat-card-actions>
-
       </mat-card>
     </div>
 
-    <!-- Paginación clásica -->
     <div class="pagination-controls">
       <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">
         <mat-icon>chevron_left</mat-icon>
@@ -189,14 +187,13 @@
       </button>
 
       <span class="page-info">
-        Página {{ currentPage }} de {{ lastPage }}
-      </span>
+      Página {{ currentPage }} de {{ lastPage }}
+    </span>
 
       <button mat-button (click)="nextPage()" [disabled]="currentPage === lastPage">
         Siguiente
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
-    <!-- Fin paginación -->
   </div>
 </div>

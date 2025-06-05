@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -41,7 +40,7 @@ class ProductController extends Controller
 
             // Paginación (per_page viene de Angular)
             $perPage = $request->get('per_page', 12);
-            $perPage = min($perPage, 50); // tope máximo de 50
+            $perPage = min($perPage, 50);
 
             if ($request->has('page')) {
                 $products = $query->paginate($perPage);

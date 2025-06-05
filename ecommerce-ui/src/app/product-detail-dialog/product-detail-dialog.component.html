@@ -1,0 +1,22 @@
+<h2 mat-dialog-title><strong>{{ data.name }}</strong></h2>
+
+<mat-dialog-content class="dialog-content">
+  <div class="image-container">
+    <img
+      [src]="data.image_url"
+      [alt]="data.name"
+      (error)="onImageError($event)"
+    />
+  </div>
+
+  <div class="details-container">
+    <p><strong>Precio:</strong> {{ formatPrice(data.price) }}</p>
+    <p><strong>Categoría:</strong> {{ data.category?.name || 'Sin categoría' }}</p>
+    <p class="description"><strong>Descripción:</strong></p>
+    <p>{{ data.description }}</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cerrar</button>
+</mat-dialog-actions>
