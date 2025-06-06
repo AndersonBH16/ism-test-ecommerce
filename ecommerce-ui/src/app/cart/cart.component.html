@@ -46,6 +46,7 @@
                   {{ product.category.name }}
                 </mat-chip>
                 <div class="item-footer">
+                  <br>
                   <span class="unit-price">
                     Precio unitario: {{ formatPrice(product.price) }}
                   </span>
@@ -99,13 +100,29 @@
             </div>
           </mat-card-content>
           <mat-card-actions align="end">
-            <button mat-raised-button class="checkout-btn" (click)="createOrderProducts()" [disabled]="cartProducts.length === 0">
-              <mat-icon>payment</mat-icon>
-              Registrar Pedido
+            <button
+              mat-raised-button
+              class="checkout-btn"
+              (click)="createOrderProducts()"
+              [disabled]="cartProducts.length === 0 || isSubmittingOrder">
+              <mat-progress-spinner
+                *ngIf="isSubmittingOrder"
+                mode="indeterminate"
+                diameter="20">
+              </mat-progress-spinner>
+
+              <ng-container *ngIf="!isSubmittingOrder">
+                <mat-icon>payment</mat-icon>
+                <span>Registrar Pedido</span>
+              </ng-container>
             </button>
-            <button mat-stroked-button color="primary" routerLink="/home/productos">
+            <button
+              mat-stroked-button
+              color="primary"
+              routerLink="/home/productos"
+              [disabled]="isSubmittingOrder">
               <mat-icon>arrow_back</mat-icon>
-              Seguir Comprando
+              <span>Seguir Comprando</span>
             </button>
           </mat-card-actions>
         </mat-card>

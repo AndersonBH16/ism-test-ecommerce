@@ -16,8 +16,8 @@ export class CartComponent implements OnInit {
   cartProducts: Product[] = [];
   loading = false;
   totalAmount = 0;
-
   cartQuantities: { [productId: number]: number } = {};
+  isSubmittingOrder = false;
 
   constructor(
     private router: Router,
@@ -30,15 +30,20 @@ export class CartComponent implements OnInit {
     this.cartService.cartItems$.subscribe(() => {
       this.loadCart();
     });
+    this.loadCart();
   }
 
   loadCart(): void {
     const cartItems: CartItem[] = this.cartService.getCartItems();
+
     if (!cartItems || cartItems.length === 0) {
       this.cartProducts = [];
       this.cartQuantities = {};
+      this.loading = false;
       return;
     }
+
+    this.loading = true;
 
     const observables = cartItems.map(item =>
       this.productService.getProduct(item.id).pipe(
@@ -49,14 +54,21 @@ export class CartComponent implements OnInit {
       )
     );
 
-    forkJoin(observables).subscribe(results => {
-      const validResults = results.filter(r => r !== null) as { product: Product; quantity: number }[];
-      this.cartProducts = validResults.map(r => r.product);
-      this.cartQuantities = {};
-      validResults.forEach(r => {
-        this.cartQuantities[r.product.id] = r.quantity;
-      });
-      this.calculateTotal();
+    forkJoin(observables).subscribe({
+      next: results => {
+        const validResults = results.filter(r => r !== null) as { product: Product; quantity: number }[];
+        this.cartProducts = validResults.map(r => r.product);
+        this.cartQuantities = {};
+        validResults.forEach(r => {
+          this.cartQuantities[r.product.id] = r.quantity;
+        });
+        this.calculateTotal();
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error al cargar el carrito:', err);
+        this.loading = false;
+      }
     });
   }
 
@@ -119,6 +131,8 @@ export class CartComponent implements OnInit {
       return;
     }
 
+    this.isSubmittingOrder = true;
+
     const payload = this.cartProducts.map(prod => ({
       id: prod.id,
       quantity: this.cartQuantities[prod.id] || 1
@@ -133,10 +147,12 @@ export class CartComponent implements OnInit {
             verticalPosition: 'bottom'
           });
           this.cartService.clearCart();
+          this.router.navigate(['/home/productos']);
         } else {
           this.snackBar.open('Error al registrar el pedido', 'Cerrar', {
             duration: 3000
           });
+          this.isSubmittingOrder = false;
         }
       },
       error: (err) => {
@@ -146,6 +162,7 @@ export class CartComponent implements OnInit {
           'Cerrar',
           { duration: 4000 }
         );
+        this.isSubmittingOrder = false;
       }
     });
   }
