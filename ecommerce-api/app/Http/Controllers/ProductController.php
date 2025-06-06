@@ -13,7 +13,7 @@ class ProductController extends Controller
         try {
             $query = Product::with('category');
 
-            // Filtros de búsqueda...
+            // Filtros de búsqueda
             if ($request->has('search') && !empty($request->search)) {
                 $searchTerm = $request->search;
                 $query->where(function($q) use ($searchTerm) {
@@ -22,7 +22,7 @@ class ProductController extends Controller
                 });
             }
 
-            // Filtro por categorías...
+            // Filtro por categorías
             if ($request->has('categories') && is_array($request->categories)) {
                 $categories = array_filter($request->categories);
                 if (!empty($categories)) {
@@ -38,8 +38,7 @@ class ProductController extends Controller
                 $query->orderBy($sortBy, $sortOrder);
             }
 
-            // Paginación (per_page viene de Angular)
-            $perPage = $request->get('per_page', 12);
+            $perPage = $request->get('per_page', 12); // este dato viene del front angular
             $perPage = min($perPage, 50);
 
             if ($request->has('page')) {
@@ -62,7 +61,6 @@ class ProductController extends Controller
                     'message' => 'Productos obtenidos exitosamente'
                 ], 200);
             } else {
-                // Si no hay page, devuelve un simple limit()
                 $products = $query->limit($perPage)->get();
                 $products->transform(function ($product) {
                     return $this->transformProduct($product);

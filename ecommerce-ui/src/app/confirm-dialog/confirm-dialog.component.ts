@@ -1,4 +1,3 @@
-// Componente de diálogo de confirmación (debes crearlo por separado)
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 

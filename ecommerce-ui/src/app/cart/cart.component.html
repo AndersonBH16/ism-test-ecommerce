@@ -12,7 +12,6 @@
   </div>
 
   <div *ngIf="!loading" class="cart-content">
-    <!-- Carrito vacío -->
     <div *ngIf="!loading && cartProducts.length === 0" class="empty-cart">
       <mat-icon class="empty-icon">shopping_cart</mat-icon>
       <h3>Tu carrito está vacío</h3>
@@ -22,19 +21,14 @@
       </button>
     </div>
 
-    <!-- Carrito con productos -->
     <div *ngIf="cartProducts.length > 0" class="cart-items-container">
-      <!-- Sección de items del carrito (izquierda) -->
       <div class="cart-items-section">
-        <!-- Botón para vaciar carrito -->
         <div class="cart-actions-header">
           <button mat-stroked-button (click)="clearCart()" [disabled]="cartProducts.length === 0">
             <mat-icon>delete_sweep</mat-icon>
             Vaciar Carrito
           </button>
         </div>
-
-        <!-- Lista de ítems -->
         <div class="cart-items">
           <mat-card class="cart-item" *ngFor="let product of cartProducts; trackBy: trackByProductId">
             <div class="item-content">
@@ -51,8 +45,6 @@
                 <mat-chip *ngIf="product.category">
                   {{ product.category.name }}
                 </mat-chip>
-
-                <!-- Precio unitario, cantidad y subtotal -->
                 <div class="item-footer">
                   <span class="unit-price">
                     Precio unitario: {{ formatPrice(product.price) }}
@@ -66,7 +58,6 @@
                 </div>
               </div>
 
-              <!-- Botón para eliminar individualmente -->
               <button mat-icon-button class="remove-btn" (click)="removeItem(product)">
                 <mat-icon color="warn">delete</mat-icon>
               </button>
@@ -75,14 +66,12 @@
         </div>
       </div>
 
-      <!-- Resumen del pedido (derecha) -->
       <div class="cart-summary-section">
         <mat-card class="cart-summary">
           <mat-card-header>
             <mat-card-title>Resumen del Pedido</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <!-- Detalle de productos -->
             <div class="summary-header">
               <span class="header-product">Producto</span>
               <span class="header-quantity">Cantidad</span>

@@ -86,7 +86,6 @@ export class CartComponent implements OnInit {
     this.snackBar.open(`${product.name} eliminado del carrito`, 'Cerrar', {
       duration: 2000
     });
-    // La suscripción a cartItems$ volverá a disparar loadCart()
   }
 
   clearCart(): void {
@@ -94,7 +93,6 @@ export class CartComponent implements OnInit {
     this.snackBar.open(`Carrito vaciado`, 'Cerrar', {
       duration: 2000
     });
-    // loadCart() se dispara automáticamente
   }
 
   formatPrice(price: any): string {
@@ -112,25 +110,8 @@ export class CartComponent implements OnInit {
     return product.id;
   }
 
-  // Método para manejar error de carga de imagen
   onImageError(event: any): void {
     event.target.src = 'assets/img/ecommerce_icon.jpg';
-  }
-
-  increaseCartQuantity(product: Product): void {
-    const currentQty = this.cartQuantities[product.id] || 1;
-    if (currentQty < product.stock) {
-      const newQty = currentQty + 1;
-      this.cartService.updateQuantity(product.id, newQty);
-    }
-  }
-
-  decreaseCartQuantity(product: Product): void {
-    const currentQty = this.cartQuantities[product.id] || 1;
-    if (currentQty > 1) {
-      const newQty = currentQty - 1;
-      this.cartService.updateQuantity(product.id, newQty);
-    }
   }
 
   createOrderProducts(): void {

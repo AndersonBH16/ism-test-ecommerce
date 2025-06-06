@@ -16,16 +16,10 @@ class DashboardController extends Controller
     public function index(): JsonResponse
     {
         try {
-            // 1) Total de usuarios
             $totalUsers = User::count();
-
-            // 2) Total de productos
             $totalProducts = Product::count();
-
-            // 3) Total de pedidos
             $totalOrders = Order::count();
 
-            // 4) Producto más solicitado (sumando cantidades en order_items)
             $mostRequested = DB::table('order_items')
                 ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
                 ->groupBy('product_id')
@@ -34,7 +28,6 @@ class DashboardController extends Controller
                 ->first();
 
             if ($mostRequested) {
-                // Obtener nombre del producto
                 $product = Product::find($mostRequested->product_id);
                 $mostRequestedProduct = [
                     'id' => $product->id,
