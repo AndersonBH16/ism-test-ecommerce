@@ -1,3 +1,4 @@
+/* Toolbar principal */
 .toolbar {
   background-color: #ffffff;
   border-bottom: 1px solid #dee2e6;
@@ -5,18 +6,22 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  height: 64px;
+  padding: 0 16px;
 }
 
 .app-name {
   font-size: 1.2rem;
   font-weight: 500;
   margin-left: 10px;
+  color: #06162f;
 }
 
 .spacer {
   flex: 1 1 auto;
 }
 
+/* Icono del carrito - versión desktop */
 .cart-icon {
   position: relative;
   width: 48px;
@@ -29,6 +34,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  margin-right: 1rem;
 }
 
 .cart-icon:hover {
@@ -40,6 +46,7 @@
   font-size: 24px;
 }
 
+/* Badge del carrito */
 .cart-badge {
   position: absolute;
   top: 4px;
@@ -58,95 +65,212 @@
 }
 
 @keyframes badge-pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.3);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
 }
 
-.toolbar .cart-icon {
-  margin-right: 1rem;
-}
-
+/* Botón de usuario */
 button[mat-button] {
   text-transform: none;
   font-size: 0.95rem;
-}
-
-/* ----------------------------------------------------
-DISENIO ALTERNATIVO PARA PROBARR
-/*
-
-.toolbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.app-name {
-  font-size: 1.2rem;
+  color: #06162f;
   font-weight: 500;
-  margin-left: 10px;
 }
 
-.spacer {
-  flex: 1 1 auto;
+/* Usuario info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.user-name {
+  font-weight: 500;
+  color: #06162f;
+}
 
-.cart-icon {
-  position: relative;
-  padding: 8px;
+/* CARRITO FLOTANTE PARA MOBILE */
+.floating-cart {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #ff6a00, #ee0979);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(135deg, #da8123 0%, #e8941f 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(218, 129, 35, 0.4);
+  z-index: 1001;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
-.cart-icon:hover {
+.floating-cart:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 25px rgba(218, 129, 35, 0.6);
 }
 
-.cart-icon__icon {
+.floating-cart mat-icon {
+  font-size: 28px;
   color: white;
-  font-size: 24px;
 }
 
-.cart-badge {
+.floating-cart .cart-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ff3d00;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
-  min-width: 20px;
+  top: -2px;
+  right: -2px;
+  width: 20px;
   height: 20px;
-  line-height: 20px;
-  text-align: center;
+  background: #ff0000;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
   border-radius: 50%;
-  box-shadow: 0 0 0 rgba(255, 61, 0, 0.7);
-  animation: pulse 1.5s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  animation: badge-pulse 1.5s infinite ease-in-out;
 }
 
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 61, 0, 0.7);
+/* RESPONSIVE DESIGN */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 0 12px;
   }
-  70% {
-    box-shadow: 0 0 0 6px rgba(255, 61, 0, 0);
+
+  .app-name {
+    font-size: 1.1rem;
+    margin-left: 8px;
   }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 61, 0, 0);
+
+  .cart-icon {
+    width: 44px;
+    height: 44px;
+    margin-right: 0.5rem;
+  }
+
+  .cart-icon__icon {
+    font-size: 22px;
+  }
+
+  button[mat-button] {
+    font-size: 0.9rem;
+    padding: 0 8px;
   }
 }
 
- */
+/* Mobile */
+@media (max-width: 480px) {
+  .toolbar {
+    height: 56px;
+    padding: 0 8px;
+  }
+
+  .app-name {
+    font-size: 0.95rem;
+    margin-left: 6px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Ocultar carrito normal en mobile */
+  .cart-icon {
+    display: none;
+  }
+
+  /* Mostrar carrito flotante en mobile */
+  .floating-cart {
+    display: flex;
+  }
+
+  /* Ajustar botón de usuario en mobile */
+  button[mat-button] {
+    font-size: 0.85rem;
+    padding: 0 4px;
+    min-width: auto;
+  }
+
+  .user-info {
+    gap: 4px;
+  }
+
+  .user-name {
+    font-size: 0.85rem;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Icono de menú más pequeño */
+  .toolbar button[mat-icon-button] {
+    width: 40px;
+    height: 40px;
+  }
+
+  .toolbar button[mat-icon-button] mat-icon {
+    font-size: 20px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .app-name {
+    font-size: 0.9rem;
+    max-width: 120px;
+  }
+
+  .user-name {
+    max-width: 60px;
+  }
+
+  .floating-cart {
+    width: 52px;
+    height: 52px;
+    top: 16px;
+    right: 16px;
+  }
+
+  .floating-cart mat-icon {
+    font-size: 24px;
+  }
+}
+
+/* Animaciones adicionales */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+.floating-cart {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Menu dropdown responsive */
+@media (max-width: 480px) {
+  .mat-menu-panel {
+    max-width: 280px !important;
+    min-width: 200px !important;
+  }
+
+  .mat-menu-item {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    padding: 12px 16px;
+  }
+
+  .mat-menu-item mat-icon {
+    margin-right: 12px;
+    font-size: 20px;
+  }
+}

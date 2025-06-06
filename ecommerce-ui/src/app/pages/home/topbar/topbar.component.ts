@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import {Component, EventEmitter, Output, OnInit, Input} from '@angular/core';
 import { AuthService } from "../../../core/auth.service";
 import { Router } from "@angular/router";
 import { CartService, CartItem } from "../../../cart/cart.service";
@@ -10,7 +10,7 @@ import { CartService, CartItem } from "../../../cart/cart.service";
 })
 export class TopbarComponent implements OnInit {
   @Output() toggleSidenav = new EventEmitter<void>();
-  cartItemCount = 0;
+  @Input() cartItemCount: number = 0;
 
   constructor(
     private auth: AuthService,

@@ -2,18 +2,18 @@
   <button mat-icon-button (click)="toggleSidenav.emit()">
     <mat-icon>menu</mat-icon>
   </button>
-
   <span class="app-name">Ecommerce - San Miguel Industries</span>
   <span class="spacer"></span>
 
+  <!-- Carrito normal para desktop/tablet -->
   <button mat-icon-button [routerLink]="['/home/buycart']" class="cart-icon">
-    <mat-icon>shopping_cart</mat-icon>
+    <mat-icon class="cart-icon__icon">shopping_cart</mat-icon>
     <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
   </button>
 
-  <button mat-button [matMenuTriggerFor]="userMenu">
+  <button mat-button [matMenuTriggerFor]="userMenu" class="user-info">
     <mat-icon>account_circle</mat-icon>
-    Anderson
+    <span class="user-name">Anderson</span>
   </button>
 
   <mat-menu #userMenu="matMenu">
@@ -35,3 +35,9 @@
     </button>
   </mat-menu>
 </mat-toolbar>
+
+<!-- Carrito flotante para mobile -->
+<button class="floating-cart" [routerLink]="['/home/buycart']">
+  <mat-icon>shopping_cart</mat-icon>
+  <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+</button>

@@ -1,46 +1,244 @@
-.logo-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  padding-top: 1rem;
+/* Contenedor principal del sidebar */
+:host {
+  background: linear-gradient(180deg, #06162f 0%, #0a1a35 50%, #06162f 100%);
+  height: 100vh;
+  display: block;
+  color: white;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
+/* Efecto de brillo sutil en el fondo */
+:host::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.03) 50%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Contenedor del logo */
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 2rem 1rem 1rem;
+  position: relative;
+}
+
+/* Logo con efectos mejorados */
 .logo {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 3px solid rgba(255, 255, 255, 0.2);
   object-fit: cover;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1rem;
 }
 
-:host {
-  background-color: #06162f;
-  height: 100%;
-  display: block;
-  color: white;
+.logo:hover {
+  transform: scale(1.05);
+  border-color: #da8123;
+  box-shadow: 0 6px 20px rgba(218, 129, 35, 0.4);
 }
 
-mat-icon {
-  color: white;
-  margin-right: 10px;
+/* Texto del nombre de la empresa */
+.company-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
+  letter-spacing: 0.5px;
 }
 
-mat-nav-list span{
-  padding-top: 0;
-  color: white;
+.company-name .highlight {
+  color: #da8123;
+  font-weight: 700;
 }
 
+/* Lista de navegación */
+mat-nav-list {
+  padding: 0;
+}
+
+/* Items de la lista */
 mat-nav-list a.mat-list-item {
   color: white;
   font-weight: 500;
-  transition: background-color 0.3s;
-  padding: 12px 16px;
+  transition: all 0.3s ease;
+  padding: 16px 20px;
+  margin: 4px 12px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border-left: 3px solid transparent;
 }
 
+/* Efecto hover */
 mat-nav-list a.mat-list-item:hover {
-  background-color: rgb(7, 28, 59);
+  background: linear-gradient(90deg, rgba(218, 129, 35, 0.15) 0%, rgba(218, 129, 35, 0.05) 100%);
+  transform: translateX(5px);
+  border-left-color: #da8123;
+  box-shadow: 0 4px 12px rgba(218, 129, 35, 0.2);
 }
 
+/* Estado activo */
 .active-link {
-  background-color: rgb(218, 129, 35);
+  background: linear-gradient(90deg, #da8123 0%, #e8941f 100%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  transform: translateX(8px);
+  border-left-color: #fff !important;
+  box-shadow: 0 6px 20px rgba(218, 129, 35, 0.4);
+}
+
+.active-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Iconos */
+mat-icon {
+  color: white;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+  font-size: 22px;
+}
+
+mat-nav-list a.mat-list-item:hover mat-icon {
+  color: #da8123;
+  transform: scale(1.1);
+}
+
+.active-link mat-icon {
+  color: white !important;
+  transform: scale(1.1);
+}
+
+/* Texto de los spans */
+mat-nav-list span {
+  padding-top: 0;
+  color: white;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Tablet */
+@media (max-width: 768px) {
+  :host {
+    width: 280px;
+  }
+
+  .logo {
+    width: 70px;
+    height: 70px;
+  }
+
+  .company-name {
+    font-size: 0.8rem;
+  }
+
+  mat-nav-list a.mat-list-item {
+    padding: 14px 16px;
+    margin: 3px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  :host {
+    width: 70px;
+    transition: width 0.3s ease;
+  }
+
+  :host.expanded {
+    width: 280px;
+  }
+
+  :host:not(.expanded) .company-name,
+  :host:not(.expanded) mat-nav-list span {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  /* Centrar iconos en modo colapsado */
+  :host:not(.expanded) mat-nav-list a.mat-list-item {
+    justify-content: center;
+    padding: 12px;
+    margin: 3px 5px;
+  }
+
+  :host:not(.expanded) mat-icon {
+    margin-right: 0;
+  }
+
+  /* Logo más pequeño en mobile */
+  :host:not(.expanded) .logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  :host:not(.expanded) .logo-container {
+    padding: 1rem 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Mostrar contenido cuando está expandido */
+  :host.expanded .company-name,
+  :host.expanded mat-nav-list span {
+    opacity: 1;
+    visibility: visible;
+    width: auto;
+    transition: all 0.3s ease 0.1s;
+  }
+
+  :host.expanded mat-nav-list a.mat-list-item {
+    justify-content: flex-start;
+    padding: 14px 16px;
+  }
+
+  :host.expanded mat-icon {
+    margin-right: 15px;
+  }
+}
+
+:host::-webkit-scrollbar {
+  width: 6px;
+}
+
+:host::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:host::-webkit-scrollbar-thumb {
+  background: rgba(218, 129, 35, 0.6);
+  border-radius: 3px;
+}
+
+:host::-webkit-scrollbar-thumb:hover {
+  background: rgba(218, 129, 35, 0.8);
 }
