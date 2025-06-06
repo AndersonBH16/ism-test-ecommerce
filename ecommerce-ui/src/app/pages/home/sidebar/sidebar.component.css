@@ -10,7 +10,6 @@
   transition: all 0.3s ease;
 }
 
-/* Efecto de brillo sutil en el fondo */
 :host::before {
   content: '';
   position: absolute;
@@ -70,11 +69,10 @@ mat-nav-list {
   padding: 0;
 }
 
-/* Items de la lista */
 mat-nav-list a.mat-list-item {
   color: white;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: none;
   padding: 16px 20px;
   margin: 4px 12px;
   border-radius: 12px;
@@ -85,54 +83,42 @@ mat-nav-list a.mat-list-item {
 
 /* Efecto hover */
 mat-nav-list a.mat-list-item:hover {
-  background: linear-gradient(90deg, rgba(218, 129, 35, 0.15) 0%, rgba(218, 129, 35, 0.05) 100%);
-  transform: translateX(5px);
-  border-left-color: #da8123;
-  box-shadow: 0 4px 12px rgba(218, 129, 35, 0.2);
+  background: rgba(255, 109, 0, 0.15);
+  transform: none;
+  border-left-color: #ff6d00;
+  box-shadow: 0 4px 12px rgba(255, 109, 0, 0.2);
 }
 
 /* Estado activo */
 .active-link {
-  background: linear-gradient(90deg, #da8123 0%, #e8941f 100%) !important;
+  background: #ff6d00 !important;
   color: white !important;
   font-weight: 600 !important;
-  transform: translateX(8px);
-  border-left-color: #fff !important;
-  box-shadow: 0 6px 20px rgba(218, 129, 35, 0.4);
+  transform: none;
+  border-left-color: white !important;
+  box-shadow: 0 6px 20px rgba(255, 109, 0, 0.4);
 }
 
 .active-link::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  content: none;
 }
 
 /* Iconos */
 mat-icon {
   color: white;
   margin-right: 15px;
-  transition: all 0.3s ease;
+  transition: none;
   font-size: 22px;
 }
 
 mat-nav-list a.mat-list-item:hover mat-icon {
-  color: #da8123;
-  transform: scale(1.1);
+  color: #ff6d00;
+  transform: none;
 }
 
 .active-link mat-icon {
   color: white !important;
-  transform: scale(1.1);
+  transform: none;
 }
 
 /* Texto de los spans */
@@ -147,35 +133,28 @@ mat-nav-list span {
 
 /* Tablet */
 @media (max-width: 768px) {
+  /* En tablet, el sidebar se comporta normalmente */
   :host {
-    width: 280px;
-  }
-
-  .logo {
-    width: 70px;
-    height: 70px;
-  }
-
-  .company-name {
-    font-size: 0.8rem;
-  }
-
-  mat-nav-list a.mat-list-item {
-    padding: 14px 16px;
-    margin: 3px 8px;
+    width: 250px;
   }
 }
 
+/* Móvil */
 @media (max-width: 480px) {
   :host {
     width: 70px;
     transition: width 0.3s ease;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
   }
 
   :host.expanded {
     width: 280px;
   }
 
+  /* Ocultar textos en modo colapsado */
   :host:not(.expanded) .company-name,
   :host:not(.expanded) mat-nav-list span {
     opacity: 0;
@@ -235,10 +214,10 @@ mat-nav-list span {
 }
 
 :host::-webkit-scrollbar-thumb {
-  background: rgba(218, 129, 35, 0.6);
+  background: rgba(255, 109, 0, 0.6);
   border-radius: 3px;
 }
 
 :host::-webkit-scrollbar-thumb:hover {
-  background: rgba(218, 129, 35, 0.8);
+  background: rgba(255, 109, 0, 0.8);
 }

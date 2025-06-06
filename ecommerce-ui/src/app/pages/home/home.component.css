@@ -19,3 +19,56 @@
   overflow-y: auto;
   background-color: #ffffff;
 }
+
+/* RESPONSIVE DESIGN */
+
+/* Tablet y móvil */
+@media (max-width: 768px) {
+  .sidenav {
+    width: 250px;
+    position: fixed; /* Cambiado de absolute a fixed */
+    z-index: 1000;
+    height: 100vh;
+  }
+
+  /* Asegurar que el contenido principal ocupe todo el ancho */
+  .main-content {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .content-wrapper {
+    padding: 12px;
+    width: 100%;
+  }
+}
+
+/* Móvil específico */
+@media (max-width: 480px) {
+  .sidenav {
+    width: 70px; /* Ancho colapsado */
+    transition: width 0.3s ease;
+  }
+
+  /* Cuando el sidebar está expandido */
+  .sidenav.expanded {
+    width: 280px;
+  }
+
+  /* Ajustar el contenido cuando el sidebar está colapsado */
+  .main-content {
+    margin-left: 70px; /* Margen igual al ancho del sidebar colapsado */
+    width: calc(100% - 70px);
+    transition: all 0.3s ease;
+  }
+
+  /* Cuando el sidebar está expandido, el contenido se oculta */
+  .sidenav.expanded ~ .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .content-wrapper {
+    padding: 10px;
+  }
+}

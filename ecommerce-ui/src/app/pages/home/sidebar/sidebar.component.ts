@@ -28,16 +28,4 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.isExpanded = true;
     }
   }
-
-  toggleSidebar() {
-    if (window.innerWidth < 480) {
-      this.isExpanded = !this.isExpanded;
-    }
-  }
-  
-  collapseSidebarOnMobile() {
-    if (window.innerWidth < 480) {
-      this.isExpanded = false;
-    }
-  }
 }

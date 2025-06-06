@@ -20,9 +20,7 @@ Route::group([
     'middleware' => ['api', 'auth:api']
 ], function () {
     Route::get('metrics', [DashboardController::class, 'index']);
-
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
-
     Route::apiResource('products', ProductController::class);
     Route::get('products/search', [ProductController::class, 'search']);
 
