@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { CartService, CartItem } from '../cart.service';
-import { ProductService, Product } from '../products.service';
+import { CartService, CartItem } from './cart.service';
+import { ProductService, Product } from '../products/products.service';
 import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({

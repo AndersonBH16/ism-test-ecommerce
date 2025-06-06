@@ -1,0 +1,294 @@
+/* dashboard.component.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:host {
+  display: block;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Partículas de fondo más sutiles */
+.dashboard-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.15) 0%, transparent 50%);
+  z-index: -1;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.header h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #00F5FFFF;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 245, 255, 0.3);
+  border-top: 3px solid #00f5ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: rgba(255, 82, 82, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  color: #ff5252;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem !important;
+  margin-bottom: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(20px);
+  border-radius: 25px !important;
+  padding: 2.5rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.card-icon {
+  font-size: 3rem !important;
+  margin-right: 1rem;
+  padding: 0.5rem;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Inter', sans-serif;
+}
+
+.card-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 1rem 0;
+  background: linear-gradient(45deg, #00f5ff, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Colores específicos para cada tarjeta */
+.total-users .card-icon {
+  color: #00f5ff;
+  background: rgba(0, 245, 255, 0.2);
+}
+
+.total-products .card-icon {
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.2);
+}
+
+.total-orders .card-icon {
+  color: #ff00f5;
+  background: rgba(255, 0, 245, 0.2);
+}
+
+.most-requested-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.most-requested {
+  max-width: 500px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(20px);
+  border-radius: 25px !important;
+  padding: 2.5rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.prd-name {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #00f5ff;
+  font-family: 'Inter', sans-serif;
+}
+
+.prd-count {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+}
+
+.no-data {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  font-family: 'Inter', sans-serif;
+}
+
+.no-data mat-icon {
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+/* Animación de entrada más sutil */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card:nth-child(1) { animation: slideUp 0.6s ease-out 0.1s both; }
+.stat-card:nth-child(2) { animation: slideUp 0.6s ease-out 0.2s both; }
+.stat-card:nth-child(3) { animation: slideUp 0.6s ease-out 0.3s both; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .header h2 {
+    font-size: 2.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 2rem !important;
+  }
+
+  .card-value {
+    font-size: 2.5rem;
+  }
+
+  .card-icon {
+    font-size: 2.5rem !important;
+  }
+
+  .most-requested {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h2 {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .card-value {
+    font-size: 2.2rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+}

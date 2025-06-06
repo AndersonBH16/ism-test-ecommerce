@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\Api\LogoutController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
@@ -18,6 +19,8 @@ Route::group([
 Route::group([
     'middleware' => ['api', 'auth:api']
 ], function () {
+    Route::get('metrics', [DashboardController::class, 'index']);
+
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 
     Route::apiResource('products', ProductController::class);

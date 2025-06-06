@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { AuthService } from "../../../core/auth.service";
 import { Router } from "@angular/router";
-import { CartService, CartItem } from "../../../cart.service";
+import { CartService, CartItem } from "../../../cart/cart.service";
 
 @Component({
   selector: 'app-topbar',

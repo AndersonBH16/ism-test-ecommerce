@@ -25,7 +25,6 @@ import { HomeModule } from "./pages/home/home.module";
 import { CartComponent } from './cart/cart.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
-import { CartBadgeComponent } from './cart-badge/cart-badge.component';
 import {MatChipsModule} from "@angular/material/chips";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatCheckboxModule} from "@angular/material/checkbox";
@@ -33,6 +32,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatBadgeModule} from "@angular/material/badge";
 import {ProductDetailDialogComponent} from "./product-detail-dialog/product-detail-dialog.component";
+import {DashboardComponent} from "./pages/home/dashboard/dashboard.component";
 
 @NgModule({
   declarations: [
@@ -40,8 +40,8 @@ import {ProductDetailDialogComponent} from "./product-detail-dialog/product-deta
     ProductsComponent,
     CartComponent,
     ConfirmDialogComponent,
-    CartBadgeComponent,
-    ProductDetailDialogComponent
+    ProductDetailDialogComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

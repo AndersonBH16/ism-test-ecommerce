@@ -1,6 +1,56 @@
-<div class="products-container">
+<div class="dashboard-container">
   <div class="header">
-    <h2>Dashboard</h2>
-    <p class="subtitle">Bienvenido al Ecommerce</p>
+    <h2>SAN MIGUEL INDUSTRIES</h2>
+    <p class="subtitle">Bienvenido a la tienda virtual de Industrias San Miguel</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Cargando estadísticas...</p>
+  </div>
+  <div *ngIf="!loading && stats" class="stats-grid">
+    <mat-card class="stat-card total-users">
+      <div class="card-header">
+        <mat-icon class="card-icon">people</mat-icon>
+        <div class="card-title">Usuarios Registrados</div>
+      </div>
+      <div class="card-value">{{ formatNumber(stats.total_users) }}</div>
+    </mat-card>
+
+    <mat-card class="stat-card total-products">
+      <div class="card-header">
+        <mat-icon class="card-icon">inventory</mat-icon>
+        <div class="card-title">Productos Disponibles</div>
+      </div>
+      <div class="card-value">{{ formatNumber(stats.total_products) }}</div>
+    </mat-card>
+
+    <mat-card class="stat-card total-orders">
+      <div class="card-header">
+        <mat-icon class="card-icon">shopping_cart</mat-icon>
+        <div class="card-title">Pedidos Realizados</div>
+      </div>
+      <div class="card-value">{{ formatNumber(stats.total_orders) }}</div>
+    </mat-card>
+  </div>
+  <div *ngIf="!loading && stats" class="most-requested-section">
+    <mat-card class="most-requested">
+      <div class="card-header">
+        <mat-icon class="card-icon">star</mat-icon>
+        <div class="card-title">Producto Destacado</div>
+      </div>
+      <ng-container *ngIf="stats.most_requested_product; else noData">
+        <div class="prd-name">{{ stats.most_requested_product.name }}</div>
+        <div class="prd-count">
+          Pedidos: {{ formatNumber(stats.most_requested_product.count) }}
+        </div>
+      </ng-container>
+      <ng-template #noData>
+        <div class="no-data">
+          <mat-icon style="font-size: 3rem; opacity: 0.5;">inbox</mat-icon>
+          <p>No hay datos disponibles</p>
+        </div>
+      </ng-template>
+    </mat-card>
   </div>
 </div>

@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Product, ProductService, Category } from "../products.service";
+import { Product, ProductService, Category } from "./products.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { CartService, CartItem } from "../cart.service";
+import { CartService, CartItem } from "../cart/cart.service";
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from "@angular/material/dialog";
 import { ProductDetailDialogComponent } from "../product-detail-dialog/product-detail-dialog.component";
